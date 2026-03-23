@@ -1,5 +1,9 @@
 import { create } from 'zustand';
 
+interface UsageStats {
+  [key: string]: number;
+}
+
 interface AppState {
   deviceMode: 'desktop' | 'mobile' | null;
   theme: 'light' | 'dark';
@@ -7,12 +11,16 @@ interface AppState {
   backgroundUrl: string;
   currentTool: string;
   settingsOpen: boolean;
+  userCenterOpen: boolean;
+  usageStats: UsageStats;
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (lang: string) => void;
   setBackgroundUrl: (url: string) => void;
   setCurrentTool: (tool: string) => void;
   setSettingsOpen: (open: boolean) => void;
+  setUserCenterOpen: (open: boolean) => void;
+  trackUsage: (tool: string) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
