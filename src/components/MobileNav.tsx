@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Image, Film, Video, Music, Settings, Download, X, Sparkles } from 'lucide-react';
+import { MessageSquare, Image, Film, Video, Music, Settings, Download, X, Sparkles, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 
