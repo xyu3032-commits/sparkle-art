@@ -76,7 +76,10 @@ const TextGenerator: React.FC = () => {
           } catch {}
         }
       }
+      trackUsage('textGen');
+      toast.success(t('genSuccess'));
     } catch (err) {
+      toast.error(t('genFailed'));
       setMessages((prev) => [...prev, { role: 'assistant', content: '⚠️ Error: ' + (err instanceof Error ? err.message : 'Unknown error') }]);
     }
     setLoading(false);
