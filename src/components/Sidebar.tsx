@@ -14,7 +14,7 @@ const toolItems = [
 
 const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
   const { t } = useTranslation();
-  const { currentTool, setCurrentTool, setSettingsOpen } = useAppStore();
+  const { currentTool, setCurrentTool, setSettingsOpen, setUserCenterOpen } = useAppStore();
 
   return (
     <motion.aside
