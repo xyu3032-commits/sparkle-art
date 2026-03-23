@@ -1,5 +1,11 @@
 import { create } from 'zustand';
 
+interface UserInfo {
+  email: string;
+  username: string;
+  isGuest: boolean;
+}
+
 interface UsageStats {
   [key: string]: number;
 }
@@ -13,6 +19,7 @@ interface AppState {
   settingsOpen: boolean;
   userCenterOpen: boolean;
   usageStats: UsageStats;
+  user: UserInfo | null;
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (lang: string) => void;
@@ -21,7 +28,11 @@ interface AppState {
   setSettingsOpen: (open: boolean) => void;
   setUserCenterOpen: (open: boolean) => void;
   trackUsage: (tool: string) => void;
+  setAuth: (user: UserInfo | null) => void;
+  logout: () => void;
 }
+
+const savedUser = localStorage.getItem('ai-user');
 
 export const useAppStore = create<AppState>((set) => ({
   deviceMode: localStorage.getItem('ai-device-mode') as 'desktop' | 'mobile' | null,
@@ -32,6 +43,7 @@ export const useAppStore = create<AppState>((set) => ({
   settingsOpen: false,
   userCenterOpen: false,
   usageStats: JSON.parse(localStorage.getItem('ai-usage-stats') || '{}'),
+  user: savedUser ? JSON.parse(savedUser) : null,
   setDeviceMode: (mode) => {
     localStorage.setItem('ai-device-mode', mode);
     set({ deviceMode: mode });
@@ -57,4 +69,9 @@ export const useAppStore = create<AppState>((set) => ({
     localStorage.setItem('ai-usage-stats', JSON.stringify(stats));
     return { usageStats: stats };
   }),
+  setAuth: (user) => set({ user }),
+  logout: () => {
+    localStorage.removeItem('ai-user');
+    set({ user: null });
+  },
 }));
