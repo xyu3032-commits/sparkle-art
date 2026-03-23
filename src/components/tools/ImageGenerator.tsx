@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 import { Image as ImageIcon, Loader2, Download, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
+import { toast } from 'sonner';
 
 const API_KEY = 'sk_O8fRc15IIahe01ssezlKhHQF5RV07ZOM';
-const BASE_URL = 'https://image.pollinations.ai/prompt/';
+const API_URL = 'https://gen.pollinations.ai/v1/images/generations';
 
 const ImageGenerator: React.FC = () => {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ const ImageGenerator: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [size, setSize] = useState('1024x1024');
 
   const generate = async () => {
     if (!prompt.trim()) return;
@@ -20,29 +22,39 @@ const ImageGenerator: React.FC = () => {
     setImageUrl('');
 
     try {
-      const params = new URLSearchParams({
-        model: 'flux-schnell',
-        width: '1024',
-        height: '1024',
-        seed: '42',
-        nologo: 'true',
-        enhance: 'false',
-      });
-
-      const url = `${BASE_URL}${encodeURIComponent(prompt.trim())}?${params}`;
-
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${API_KEY}` },
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'flux',
+          prompt: prompt.trim(),
+          size,
+          n: 1,
+          nologo: true,
+          seed: -1,
+          enhance: false,
+          safe: true,
+        }),
       });
 
       if (!response.ok) throw new Error(`Status: ${response.status}`);
 
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      setImageUrl(blobUrl);
-      trackUsage('imageGen');
+      const data = await response.json();
+      const url = data?.data?.[0]?.url;
+
+      if (url) {
+        setImageUrl(url);
+        trackUsage('imageGen');
+        toast.success(t('genSuccess'));
+      } else {
+        throw new Error('No image URL in response');
+      }
     } catch (err) {
       console.error('Image generation failed:', err);
+      toast.error(t('genFailed'));
     } finally {
       setLoading(false);
     }
@@ -50,11 +62,22 @@ const ImageGenerator: React.FC = () => {
 
   const handleDownload = async () => {
     if (!imageUrl) return;
-    const a = document.createElement('a');
-    a.href = imageUrl;
-    a.download = `ai-image-${Date.now()}.jpg`;
-    a.click();
+    try {
+      const res = await fetch(imageUrl);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `ai-image-${Date.now()}.png`;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+      toast.success(t('downloadSuccess'));
+    } catch {
+      toast.error(t('downloadFailed'));
+    }
   };
+
+  const sizes = ['512x512', '1024x1024', '1280x720', '720x1280'];
 
   return (
     <motion.div
@@ -66,7 +89,7 @@ const ImageGenerator: React.FC = () => {
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <div>
           <h2 className="font-semibold text-card-foreground">{t('imageGen')}</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Flux Schnell · Pollinations AI</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Flux · Pollinations Pro</p>
         </div>
         <button onClick={() => setSettingsOpen(true)} className="p-2 rounded-lg hover:bg-secondary transition-colors">
           <Settings className="w-4 h-4 text-muted-foreground" />
@@ -80,11 +103,7 @@ const ImageGenerator: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="relative max-w-lg w-full"
           >
-            <img
-              src={imageUrl}
-              alt={prompt}
-              className="w-full rounded-2xl shadow-elevated"
-            />
+            <img src={imageUrl} alt={prompt} className="w-full rounded-2xl shadow-elevated" />
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={handleDownload}
@@ -108,7 +127,23 @@ const ImageGenerator: React.FC = () => {
         )}
       </div>
 
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t border-border space-y-3">
+        {/* Size selector */}
+        <div className="flex gap-2 flex-wrap">
+          {sizes.map((s) => (
+            <button
+              key={s}
+              onClick={() => setSize(s)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                size === s
+                  ? 'gradient-bg text-primary-foreground'
+                  : 'bg-secondary text-muted-foreground hover:text-secondary-foreground'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
         <div className="flex gap-2">
           <input
             value={prompt}
