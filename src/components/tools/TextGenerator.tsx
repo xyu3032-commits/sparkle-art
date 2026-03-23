@@ -16,7 +16,7 @@ const MODEL = 'Qwen/Qwen2.5-7B-Instruct';
 
 const TextGenerator: React.FC = () => {
   const { t } = useTranslation();
-  const { setSettingsOpen } = useAppStore();
+  const { setSettingsOpen, trackUsage } = useAppStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
