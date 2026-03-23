@@ -30,6 +30,8 @@ export const useAppStore = create<AppState>((set) => ({
   backgroundUrl: localStorage.getItem('ai-bg-url') || '',
   currentTool: 'textGen',
   settingsOpen: false,
+  userCenterOpen: false,
+  usageStats: JSON.parse(localStorage.getItem('ai-usage-stats') || '{}'),
   setDeviceMode: (mode) => {
     localStorage.setItem('ai-device-mode', mode);
     set({ deviceMode: mode });
@@ -49,4 +51,10 @@ export const useAppStore = create<AppState>((set) => ({
   },
   setCurrentTool: (tool) => set({ currentTool: tool }),
   setSettingsOpen: (open) => set({ settingsOpen: open }),
+  setUserCenterOpen: (open) => set({ userCenterOpen: open }),
+  trackUsage: (tool) => set((state) => {
+    const stats = { ...state.usageStats, [tool]: (state.usageStats[tool] || 0) + 1 };
+    localStorage.setItem('ai-usage-stats', JSON.stringify(stats));
+    return { usageStats: stats };
+  }),
 }));
