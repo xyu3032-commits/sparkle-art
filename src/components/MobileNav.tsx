@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Image, Film, Video, Music, Settings, Download, X, Sparkles } from 'lucide-react';
+import { MessageSquare, Image, Film, Video, Music, Settings, Download, X, Sparkles, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 
@@ -14,7 +14,7 @@ const toolItems = [
 
 const MobileNav: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
   const { t } = useTranslation();
-  const { currentTool, setCurrentTool, setSettingsOpen } = useAppStore();
+  const { currentTool, setCurrentTool, setSettingsOpen, setUserCenterOpen } = useAppStore();
 
   return (
     <AnimatePresence>
@@ -63,6 +63,13 @@ const MobileNav: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onC
               })}
             </nav>
             <div className="p-3 space-y-1.5 border-t border-border">
+              <button
+                onClick={() => { setUserCenterOpen(true); onClose(); }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary transition-colors"
+              >
+                <User className="w-5 h-5" />
+                <span>{t('userCenter')}</span>
+              </button>
               <button
                 onClick={() => { setSettingsOpen(true); onClose(); }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary transition-colors"

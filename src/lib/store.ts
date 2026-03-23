@@ -1,5 +1,9 @@
 import { create } from 'zustand';
 
+interface UsageStats {
+  [key: string]: number;
+}
+
 interface AppState {
   deviceMode: 'desktop' | 'mobile' | null;
   theme: 'light' | 'dark';
@@ -7,12 +11,16 @@ interface AppState {
   backgroundUrl: string;
   currentTool: string;
   settingsOpen: boolean;
+  userCenterOpen: boolean;
+  usageStats: UsageStats;
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (lang: string) => void;
   setBackgroundUrl: (url: string) => void;
   setCurrentTool: (tool: string) => void;
   setSettingsOpen: (open: boolean) => void;
+  setUserCenterOpen: (open: boolean) => void;
+  trackUsage: (tool: string) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -22,6 +30,8 @@ export const useAppStore = create<AppState>((set) => ({
   backgroundUrl: localStorage.getItem('ai-bg-url') || '',
   currentTool: 'textGen',
   settingsOpen: false,
+  userCenterOpen: false,
+  usageStats: JSON.parse(localStorage.getItem('ai-usage-stats') || '{}'),
   setDeviceMode: (mode) => {
     localStorage.setItem('ai-device-mode', mode);
     set({ deviceMode: mode });
@@ -41,4 +51,10 @@ export const useAppStore = create<AppState>((set) => ({
   },
   setCurrentTool: (tool) => set({ currentTool: tool }),
   setSettingsOpen: (open) => set({ settingsOpen: open }),
+  setUserCenterOpen: (open) => set({ userCenterOpen: open }),
+  trackUsage: (tool) => set((state) => {
+    const stats = { ...state.usageStats, [tool]: (state.usageStats[tool] || 0) + 1 };
+    localStorage.setItem('ai-usage-stats', JSON.stringify(stats));
+    return { usageStats: stats };
+  }),
 }));

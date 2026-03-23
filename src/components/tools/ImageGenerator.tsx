@@ -4,18 +4,56 @@ import { Image as ImageIcon, Loader2, Download, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 
+const API_KEY = 'sk_O8fRc15IIahe01ssezlKhHQF5RV07ZOM';
+const BASE_URL = 'https://image.pollinations.ai/prompt/';
+
 const ImageGenerator: React.FC = () => {
   const { t } = useTranslation();
-  const { setSettingsOpen } = useAppStore();
+  const { setSettingsOpen, trackUsage } = useAppStore();
   const [prompt, setPrompt] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const generate = () => {
+  const generate = async () => {
     if (!prompt.trim()) return;
     setLoading(true);
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt.trim())}?width=1024&height=1024&nologo=true`;
-    setImageUrl(url);
+    setImageUrl('');
+
+    try {
+      const params = new URLSearchParams({
+        model: 'flux-schnell',
+        width: '1024',
+        height: '1024',
+        seed: '42',
+        nologo: 'true',
+        enhance: 'false',
+      });
+
+      const url = `${BASE_URL}${encodeURIComponent(prompt.trim())}?${params}`;
+
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${API_KEY}` },
+      });
+
+      if (!response.ok) throw new Error(`Status: ${response.status}`);
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      setImageUrl(blobUrl);
+      trackUsage('imageGen');
+    } catch (err) {
+      console.error('Image generation failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!imageUrl) return;
+    const a = document.createElement('a');
+    a.href = imageUrl;
+    a.download = `ai-image-${Date.now()}.jpg`;
+    a.click();
   };
 
   return (
@@ -28,7 +66,7 @@ const ImageGenerator: React.FC = () => {
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <div>
           <h2 className="font-semibold text-card-foreground">{t('imageGen')}</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Pollinations AI</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Flux Schnell · Pollinations AI</p>
         </div>
         <button onClick={() => setSettingsOpen(true)} className="p-2 rounded-lg hover:bg-secondary transition-colors">
           <Settings className="w-4 h-4 text-muted-foreground" />
@@ -46,29 +84,26 @@ const ImageGenerator: React.FC = () => {
               src={imageUrl}
               alt={prompt}
               className="w-full rounded-2xl shadow-elevated"
-              onLoad={() => setLoading(false)}
-              onError={() => setLoading(false)}
             />
-            {loading && (
-              <div className="absolute inset-0 rounded-2xl bg-card/80 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            )}
-            <motion.a
+            <motion.button
               whileTap={{ scale: 0.95 }}
-              href={imageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
+              onClick={handleDownload}
               className="absolute bottom-3 right-3 p-2 rounded-lg glass-surface border border-border hover:bg-secondary transition-colors"
             >
               <Download className="w-4 h-4 text-card-foreground" />
-            </motion.a>
+            </motion.button>
           </motion.div>
         ) : (
           <div className="text-center text-muted-foreground">
             <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p className="text-sm">{t('noResult')}</p>
+          </div>
+        )}
+
+        {loading && (
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">{t('generating')}</p>
           </div>
         )}
       </div>
