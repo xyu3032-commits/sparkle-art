@@ -276,6 +276,12 @@ const resources = {
       resetBg: "Restablecer fondo",
       bgUrl: "URL de imagen de fondo",
       apply: "Aplicar",
+      userCenter: "Centro de usuario",
+      guest: "Invitado",
+      freeUser: "Gratis",
+      totalUsage: "Uso total",
+      totalGenerations: "generaciones",
+      usageBreakdown: "Desglose de uso",
     },
   },
 };
