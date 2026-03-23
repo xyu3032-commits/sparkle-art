@@ -88,6 +88,12 @@ const resources = {
       resetBg: "Reset Background",
       bgUrl: "Background image URL",
       apply: "Apply",
+      userCenter: "User Center",
+      guest: "Guest",
+      freeUser: "Free Tier",
+      totalUsage: "Total Usage",
+      totalGenerations: "generations",
+      usageBreakdown: "Usage Breakdown",
     },
   },
   ja: {
