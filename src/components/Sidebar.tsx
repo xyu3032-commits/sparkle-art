@@ -58,8 +58,15 @@ const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
         })}
       </nav>
 
-      {/* Bottom actions */}
       <div className="p-2 space-y-1 border-t border-border">
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => setUserCenterOpen(true)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-secondary-foreground transition-colors"
+        >
+          <User className="w-[18px] h-[18px]" />
+          {!collapsed && <span>{t('userCenter')}</span>}
+        </motion.button>
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={() => setSettingsOpen(true)}

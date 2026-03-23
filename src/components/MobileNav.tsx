@@ -64,6 +64,13 @@ const MobileNav: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onC
             </nav>
             <div className="p-3 space-y-1.5 border-t border-border">
               <button
+                onClick={() => { setUserCenterOpen(true); onClose(); }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary transition-colors"
+              >
+                <User className="w-5 h-5" />
+                <span>{t('userCenter')}</span>
+              </button>
+              <button
                 onClick={() => { setSettingsOpen(true); onClose(); }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary transition-colors"
               >

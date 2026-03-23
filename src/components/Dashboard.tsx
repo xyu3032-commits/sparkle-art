@@ -78,6 +78,7 @@ const Dashboard: React.FC = () => {
 
       {/* Settings panel */}
       <SettingsPanel />
+      <UserCenter />
     </div>
   );
 };
