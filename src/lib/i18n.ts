@@ -135,6 +135,12 @@ const resources = {
       resetBg: "背景をリセット",
       bgUrl: "背景画像URL",
       apply: "適用",
+      userCenter: "ユーザーセンター",
+      guest: "ゲスト",
+      freeUser: "無料版",
+      totalUsage: "総使用量",
+      totalGenerations: "回生成",
+      usageBreakdown: "使用内訳",
     },
   },
   ko: {
