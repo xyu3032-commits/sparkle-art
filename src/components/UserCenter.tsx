@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, MessageSquare, Image, Film, Video, Music, BarChart3, Clock } from 'lucide-react';
+import { X, User, MessageSquare, Image, Film, Video, Music, BarChart3, Clock, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/lib/store';
 
 const toolMeta = [
@@ -14,10 +15,17 @@ const toolMeta = [
 
 const UserCenter: React.FC = () => {
   const { t } = useTranslation();
-  const { userCenterOpen, setUserCenterOpen, usageStats } = useAppStore();
+  const navigate = useNavigate();
+  const { userCenterOpen, setUserCenterOpen, usageStats, user, logout } = useAppStore();
 
   const totalUsage = Object.values(usageStats).reduce((a, b) => a + b, 0);
   const maxUsage = Math.max(...Object.values(usageStats), 1);
+
+  const handleLogout = () => {
+    logout();
+    setUserCenterOpen(false);
+    navigate('/auth');
+  };
 
   return (
     <AnimatePresence>
@@ -51,8 +59,12 @@ const UserCenter: React.FC = () => {
                   <User className="w-8 h-8 text-primary-foreground" />
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-card-foreground">{t('guest')}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t('freeUser')}</p>
+                  <p className="font-semibold text-card-foreground">
+                    {user?.username || t('guest')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {user?.isGuest ? t('freeUser') : (user?.email || t('freeUser'))}
+                  </p>
                 </div>
               </div>
 
@@ -99,6 +111,18 @@ const UserCenter: React.FC = () => {
                   })}
                 </div>
               </div>
+
+              {/* Logout */}
+              {user && !user.isGuest && (
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleLogout}
+                  className="w-full py-2.5 rounded-xl bg-destructive/10 text-destructive text-sm font-medium flex items-center justify-center gap-2 hover:bg-destructive/20 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  {t('logout')}
+                </motion.button>
+              )}
             </div>
           </motion.div>
         </>
