@@ -14,7 +14,7 @@ const toolItems = [
 
 const MobileNav: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
   const { t } = useTranslation();
-  const { currentTool, setCurrentTool, setSettingsOpen } = useAppStore();
+  const { currentTool, setCurrentTool, setSettingsOpen, setUserCenterOpen } = useAppStore();
 
   return (
     <AnimatePresence>
