@@ -41,6 +41,12 @@ const resources = {
       resetBg: "重置背景",
       bgUrl: "背景图片URL",
       apply: "应用",
+      userCenter: "用户中心",
+      guest: "访客用户",
+      freeUser: "免费版",
+      totalUsage: "总使用量",
+      totalGenerations: "次生成",
+      usageBreakdown: "使用明细",
     },
   },
   en: {
