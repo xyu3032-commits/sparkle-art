@@ -182,6 +182,12 @@ const resources = {
       resetBg: "배경 초기화",
       bgUrl: "배경 이미지 URL",
       apply: "적용",
+      userCenter: "사용자 센터",
+      guest: "게스트",
+      freeUser: "무료",
+      totalUsage: "총 사용량",
+      totalGenerations: "회 생성",
+      usageBreakdown: "사용 내역",
     },
   },
   fr: {
