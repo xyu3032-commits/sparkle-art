@@ -5,6 +5,7 @@ import { useAppStore } from '@/lib/store';
 import Sidebar from '@/components/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import SettingsPanel from '@/components/SettingsPanel';
+import UserCenter from '@/components/UserCenter';
 import TextGenerator from '@/components/tools/TextGenerator';
 import ImageGenerator from '@/components/tools/ImageGenerator';
 import TextToVideo from '@/components/tools/TextToVideo';
