@@ -6,6 +6,7 @@ import Sidebar from '@/components/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import SettingsPanel from '@/components/SettingsPanel';
 import UserCenter from '@/components/UserCenter';
+import BotCheck, { needsBotCheck, markBotCheckPassed } from '@/components/BotCheck';
 import TextGenerator from '@/components/tools/TextGenerator';
 import ImageGenerator from '@/components/tools/ImageGenerator';
 import TextToVideo from '@/components/tools/TextToVideo';
@@ -23,6 +24,7 @@ const toolComponents: Record<string, React.FC> = {
 const Dashboard: React.FC = () => {
   const { deviceMode, currentTool, backgroundUrl } = useAppStore();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [showBotCheck, setShowBotCheck] = useState(needsBotCheck);
   const isMobile = deviceMode === 'mobile';
   const ToolComponent = toolComponents[currentTool] || TextGenerator;
 
@@ -35,22 +37,17 @@ const Dashboard: React.FC = () => {
         backgroundPosition: 'center',
       } : undefined}
     >
-      {/* Background overlay for readability */}
       {backgroundUrl && <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />}
 
-      {/* Desktop sidebar */}
       {!isMobile && (
         <div className="relative z-10">
           <Sidebar />
         </div>
       )}
 
-      {/* Mobile nav */}
       {isMobile && <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />}
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col relative z-10 min-w-0">
-        {/* Mobile header */}
         {isMobile && (
           <div className="px-4 py-3 border-b border-border flex items-center gap-3 bg-card/80 backdrop-blur-md">
             <button onClick={() => setMobileNavOpen(true)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
@@ -59,7 +56,6 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Tool area */}
         <div className="flex-1 overflow-hidden bg-card/60 backdrop-blur-sm">
           <AnimatePresence mode="wait">
             <motion.div
@@ -76,9 +72,19 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Settings panel */}
       <SettingsPanel />
       <UserCenter />
+
+      {/* Daily bot check */}
+      {showBotCheck && (
+        <BotCheck
+          onPass={() => setShowBotCheck(false)}
+          onClose={() => {
+            markBotCheckPassed();
+            setShowBotCheck(false);
+          }}
+        />
+      )}
     </div>
   );
 };
