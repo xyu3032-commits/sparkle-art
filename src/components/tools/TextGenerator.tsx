@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, User, Loader2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
+import { toast } from 'sonner';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,7 +16,7 @@ const MODEL = 'Qwen/Qwen2.5-7B-Instruct';
 
 const TextGenerator: React.FC = () => {
   const { t } = useTranslation();
-  const { setSettingsOpen } = useAppStore();
+  const { setSettingsOpen, trackUsage } = useAppStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -75,7 +76,10 @@ const TextGenerator: React.FC = () => {
           } catch {}
         }
       }
+      trackUsage('textGen');
+      toast.success(t('genSuccess'));
     } catch (err) {
+      toast.error(t('genFailed'));
       setMessages((prev) => [...prev, { role: 'assistant', content: '⚠️ Error: ' + (err instanceof Error ? err.message : 'Unknown error') }]);
     }
     setLoading(false);
