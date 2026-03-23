@@ -229,6 +229,12 @@ const resources = {
       resetBg: "Réinitialiser le fond",
       bgUrl: "URL de l'image de fond",
       apply: "Appliquer",
+      userCenter: "Centre utilisateur",
+      guest: "Invité",
+      freeUser: "Gratuit",
+      totalUsage: "Utilisation totale",
+      totalGenerations: "générations",
+      usageBreakdown: "Détails d'utilisation",
     },
   },
   es: {
