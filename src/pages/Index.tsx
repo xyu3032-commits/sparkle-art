@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useNavigate } from 'react-router-dom';
 import '@/lib/i18n';
 import DeviceSelect from '@/components/DeviceSelect';
 import Dashboard from '@/components/Dashboard';
