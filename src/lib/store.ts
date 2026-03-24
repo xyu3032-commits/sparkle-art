@@ -10,6 +10,15 @@ interface UsageStats {
   [key: string]: number;
 }
 
+interface ApiConfig {
+  id: string;
+  name: string;
+  baseUrl: string;
+  apiKey: string;
+  model: string;
+  toolId: string;
+}
+
 interface AppState {
   deviceMode: 'desktop' | 'mobile' | null;
   theme: 'light' | 'dark';
@@ -20,6 +29,8 @@ interface AppState {
   userCenterOpen: boolean;
   usageStats: UsageStats;
   user: UserInfo | null;
+  customApis: ApiConfig[];
+  activeApis: Record<string, string>; // toolId -> apiConfig id
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (lang: string) => void;
@@ -30,11 +41,37 @@ interface AppState {
   trackUsage: (tool: string) => void;
   setAuth: (user: UserInfo | null) => void;
   logout: () => void;
+  addCustomApi: (api: ApiConfig) => void;
+  removeCustomApi: (id: string) => void;
+  setActiveApi: (toolId: string, apiId: string) => void;
+  getActiveApiForTool: (toolId: string) => ApiConfig | undefined;
 }
 
 const savedUser = localStorage.getItem('ai-user');
+const savedApis = JSON.parse(localStorage.getItem('ai-custom-apis') || '[]');
+const savedActiveApis = JSON.parse(localStorage.getItem('ai-active-apis') || '{}');
 
-export const useAppStore = create<AppState>((set) => ({
+// Default built-in APIs
+const defaultApis: ApiConfig[] = [
+  {
+    id: 'default-text',
+    name: 'SiliconFlow Qwen',
+    baseUrl: 'https://api.siliconflow.cn/v1',
+    apiKey: 'sk-xgovryksordjmsdfkihbgculbjfknsgzgvlkalqbxzgoklok',
+    model: 'Qwen/Qwen2.5-7B-Instruct',
+    toolId: 'textGen',
+  },
+  {
+    id: 'default-image',
+    name: 'SiliconFlow Kolors',
+    baseUrl: 'https://api.siliconflow.cn/v1',
+    apiKey: 'sk-xgovryksordjmsdfkihbgculbjfknsgzgvlkalqbxzgoklok',
+    model: 'Kwai-Kolors/Kolors',
+    toolId: 'imageGen',
+  },
+];
+
+export const useAppStore = create<AppState>((set, get) => ({
   deviceMode: localStorage.getItem('ai-device-mode') as 'desktop' | 'mobile' | null,
   theme: (localStorage.getItem('ai-theme') as 'light' | 'dark') || 'light',
   language: localStorage.getItem('ai-platform-lang') || 'zh',
@@ -44,6 +81,8 @@ export const useAppStore = create<AppState>((set) => ({
   userCenterOpen: false,
   usageStats: JSON.parse(localStorage.getItem('ai-usage-stats') || '{}'),
   user: savedUser ? JSON.parse(savedUser) : null,
+  customApis: savedApis,
+  activeApis: savedActiveApis,
   setDeviceMode: (mode) => {
     localStorage.setItem('ai-device-mode', mode);
     set({ deviceMode: mode });
@@ -74,4 +113,37 @@ export const useAppStore = create<AppState>((set) => ({
     localStorage.removeItem('ai-user');
     set({ user: null });
   },
+  addCustomApi: (api) => set((state) => {
+    const apis = [...state.customApis, api];
+    localStorage.setItem('ai-custom-apis', JSON.stringify(apis));
+    return { customApis: apis };
+  }),
+  removeCustomApi: (id) => set((state) => {
+    const apis = state.customApis.filter((a) => a.id !== id);
+    localStorage.setItem('ai-custom-apis', JSON.stringify(apis));
+    // Also clean activeApis
+    const active = { ...state.activeApis };
+    for (const key of Object.keys(active)) {
+      if (active[key] === id) delete active[key];
+    }
+    localStorage.setItem('ai-active-apis', JSON.stringify(active));
+    return { customApis: apis, activeApis: active };
+  }),
+  setActiveApi: (toolId, apiId) => set((state) => {
+    const active = { ...state.activeApis, [toolId]: apiId };
+    localStorage.setItem('ai-active-apis', JSON.stringify(active));
+    return { activeApis: active };
+  }),
+  getActiveApiForTool: (toolId) => {
+    const state = get();
+    const activeId = state.activeApis[toolId];
+    const allApis = [...defaultApis, ...state.customApis];
+    if (activeId) {
+      return allApis.find((a) => a.id === activeId) || allApis.find((a) => a.toolId === toolId);
+    }
+    return allApis.find((a) => a.toolId === toolId);
+  },
 }));
+
+export { defaultApis };
+export type { ApiConfig };
