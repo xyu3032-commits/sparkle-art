@@ -187,6 +187,7 @@ const resources = {
       light: "ライト",
       dark: "ダーク",
       background: "背景",
+      deviceMode: "デバイスモード",
       send: "送信",
       generate: "生成",
       generating: "生成中...",
