@@ -32,6 +32,7 @@ interface AppState {
   customApis: ApiConfig[];
   activeApis: Record<string, string>; // toolId -> apiConfig id
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
+  resetDeviceMode: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (lang: string) => void;
   setBackgroundUrl: (url: string) => void;
