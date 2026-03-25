@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sun, Moon, Globe, ImageIcon, RotateCcw } from 'lucide-react';
+import { X, Sun, Moon, Globe, ImageIcon, RotateCcw, Monitor, Smartphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 import i18n from '@/lib/i18n';
