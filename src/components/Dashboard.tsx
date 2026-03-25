@@ -6,6 +6,7 @@ import Sidebar from '@/components/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import SettingsPanel from '@/components/SettingsPanel';
 import UserCenter from '@/components/UserCenter';
+import TopBar from '@/components/TopBar';
 import BotCheck, { needsBotCheck, markBotCheckPassed } from '@/components/BotCheck';
 import TextGenerator from '@/components/tools/TextGenerator';
 import ImageGenerator from '@/components/tools/ImageGenerator';
@@ -31,11 +32,7 @@ const Dashboard: React.FC = () => {
   return (
     <div
       className="h-screen flex overflow-hidden bg-background relative"
-      style={backgroundUrl ? {
-        backgroundImage: `url(${backgroundUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      } : undefined}
+      style={backgroundUrl ? { backgroundImage: `url(${backgroundUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
     >
       {backgroundUrl && <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />}
 
@@ -48,13 +45,17 @@ const Dashboard: React.FC = () => {
       {isMobile && <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />}
 
       <div className="flex-1 flex flex-col relative z-10 min-w-0">
-        {isMobile && (
-          <div className="px-4 py-3 border-b border-border flex items-center gap-3 bg-card/80 backdrop-blur-md">
-            <button onClick={() => setMobileNavOpen(true)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-              <Menu className="w-5 h-5 text-foreground" />
-            </button>
+        {/* Top bar */}
+        <div className="px-3 sm:px-4 py-2 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            {isMobile && (
+              <button onClick={() => setMobileNavOpen(true)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+                <Menu className="w-5 h-5 text-foreground" />
+              </button>
+            )}
           </div>
-        )}
+          <TopBar />
+        </div>
 
         <div className="flex-1 overflow-hidden bg-card/60 backdrop-blur-sm">
           <AnimatePresence mode="wait">
@@ -75,14 +76,10 @@ const Dashboard: React.FC = () => {
       <SettingsPanel />
       <UserCenter />
 
-      {/* Daily bot check */}
       {showBotCheck && (
         <BotCheck
           onPass={() => setShowBotCheck(false)}
-          onClose={() => {
-            markBotCheckPassed();
-            setShowBotCheck(false);
-          }}
+          onClose={() => { markBotCheckPassed(); setShowBotCheck(false); }}
         />
       )}
     </div>
