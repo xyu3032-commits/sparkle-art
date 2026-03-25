@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sun, Moon, Globe, ImageIcon, RotateCcw } from 'lucide-react';
+import { X, Sun, Moon, Globe, ImageIcon, RotateCcw, Monitor, Smartphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 import i18n from '@/lib/i18n';
@@ -24,7 +24,7 @@ const bgPresets = [
 
 const SettingsPanel: React.FC = () => {
   const { t } = useTranslation();
-  const { theme, setTheme, language, setLanguage, backgroundUrl, setBackgroundUrl, settingsOpen, setSettingsOpen } = useAppStore();
+  const { theme, setTheme, language, setLanguage, backgroundUrl, setBackgroundUrl, settingsOpen, setSettingsOpen, deviceMode, setDeviceMode } = useAppStore();
   const [customBgInput, setCustomBgInput] = useState('');
 
   const handleLang = (code: string) => {
@@ -92,6 +92,27 @@ const SettingsPanel: React.FC = () => {
                         ${language === l.code ? 'gradient-bg text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-muted'}`}
                     >
                       {l.label}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Device Mode */}
+              <div>
+                <label className="text-sm font-medium text-card-foreground mb-3 flex items-center gap-1.5">
+                  <Monitor className="w-4 h-4" /> {t('deviceMode')}
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['desktop', 'mobile'] as const).map((d) => (
+                    <motion.button
+                      key={d}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => setDeviceMode(d)}
+                      className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors
+                        ${deviceMode === d ? 'gradient-bg text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-muted'}`}
+                    >
+                      {d === 'desktop' ? <Monitor className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
+                      {t(d)}
                     </motion.button>
                   ))}
                 </div>

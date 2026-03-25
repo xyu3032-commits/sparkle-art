@@ -30,6 +30,7 @@ const Index: React.FC = () => {
   }
 
   if (!deviceMode) return <DeviceSelect />;
+
   return <Dashboard />;
 };
 

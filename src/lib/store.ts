@@ -32,6 +32,7 @@ interface AppState {
   customApis: ApiConfig[];
   activeApis: Record<string, string>; // toolId -> apiConfig id
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
+  resetDeviceMode: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setLanguage: (lang: string) => void;
   setBackgroundUrl: (url: string) => void;
@@ -86,6 +87,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   setDeviceMode: (mode) => {
     localStorage.setItem('ai-device-mode', mode);
     set({ deviceMode: mode });
+  },
+  resetDeviceMode: () => {
+    localStorage.removeItem('ai-device-mode');
+    set({ deviceMode: null });
   },
   setTheme: (theme) => {
     localStorage.setItem('ai-theme', theme);
