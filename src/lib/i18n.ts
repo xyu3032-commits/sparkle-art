@@ -105,6 +105,7 @@ const resources = {
       light: "Light",
       dark: "Dark",
       background: "Background",
+      deviceMode: "Device Mode",
       send: "Send",
       generate: "Generate",
       generating: "Generating...",
