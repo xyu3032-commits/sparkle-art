@@ -269,6 +269,7 @@ const resources = {
       light: "라이트",
       dark: "다크",
       background: "배경",
+      deviceMode: "디바이스 모드",
       send: "전송",
       generate: "생성",
       generating: "생성 중...",
