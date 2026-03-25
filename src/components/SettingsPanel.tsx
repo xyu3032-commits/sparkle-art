@@ -97,6 +97,27 @@ const SettingsPanel: React.FC = () => {
                 </div>
               </div>
 
+              {/* Device Mode */}
+              <div>
+                <label className="text-sm font-medium text-card-foreground mb-3 flex items-center gap-1.5">
+                  <Monitor className="w-4 h-4" /> {t('deviceMode')}
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['desktop', 'mobile'] as const).map((d) => (
+                    <motion.button
+                      key={d}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => setDeviceMode(d)}
+                      className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors
+                        ${deviceMode === d ? 'gradient-bg text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-muted'}`}
+                    >
+                      {d === 'desktop' ? <Monitor className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
+                      {t(d)}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
               {/* Background */}
               <div>
                 <label className="text-sm font-medium text-card-foreground mb-3 flex items-center gap-1.5">
