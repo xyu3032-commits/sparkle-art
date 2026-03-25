@@ -433,6 +433,7 @@ const resources = {
       light: "Claro",
       dark: "Oscuro",
       background: "Fondo",
+      deviceMode: "Modo dispositivo",
       send: "Enviar",
       generate: "Generar",
       generating: "Generando...",
