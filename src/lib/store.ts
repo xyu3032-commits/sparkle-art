@@ -88,6 +88,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     localStorage.setItem('ai-device-mode', mode);
     set({ deviceMode: mode });
   },
+  resetDeviceMode: () => {
+    localStorage.removeItem('ai-device-mode');
+    set({ deviceMode: null });
+  },
   setTheme: (theme) => {
     localStorage.setItem('ai-theme', theme);
     document.documentElement.classList.toggle('dark', theme === 'dark');
