@@ -22,6 +22,7 @@ const resources = {
       light: "浅色",
       dark: "深色",
       background: "背景图片",
+      deviceMode: "设备模式",
       send: "发送",
       generate: "生成",
       generating: "生成中...",
