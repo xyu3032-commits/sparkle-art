@@ -24,7 +24,7 @@ const bgPresets = [
 
 const SettingsPanel: React.FC = () => {
   const { t } = useTranslation();
-  const { theme, setTheme, language, setLanguage, backgroundUrl, setBackgroundUrl, settingsOpen, setSettingsOpen } = useAppStore();
+  const { theme, setTheme, language, setLanguage, backgroundUrl, setBackgroundUrl, settingsOpen, setSettingsOpen, deviceMode, setDeviceMode } = useAppStore();
   const [customBgInput, setCustomBgInput] = useState('');
 
   const handleLang = (code: string) => {
