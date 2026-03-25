@@ -351,6 +351,7 @@ const resources = {
       light: "Clair",
       dark: "Sombre",
       background: "Arrière-plan",
+      deviceMode: "Mode appareil",
       send: "Envoyer",
       generate: "Générer",
       generating: "Génération...",
