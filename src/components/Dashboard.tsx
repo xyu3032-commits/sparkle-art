@@ -13,6 +13,7 @@ import ImageGenerator from '@/components/tools/ImageGenerator';
 import TextToVideo from '@/components/tools/TextToVideo';
 import ImageToVideo from '@/components/tools/ImageToVideo';
 import AudioGenerator from '@/components/tools/AudioGenerator';
+import PromptLibrary from '@/components/PromptLibrary';
 
 const toolComponents: Record<string, React.FC> = {
   textGen: TextGenerator,
@@ -20,6 +21,7 @@ const toolComponents: Record<string, React.FC> = {
   textToVideo: TextToVideo,
   imageToVideo: ImageToVideo,
   audioGen: AudioGenerator,
+  promptLib: PromptLibrary,
 };
 
 const Dashboard: React.FC = () => {
@@ -45,8 +47,8 @@ const Dashboard: React.FC = () => {
       {isMobile && <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />}
 
       <div className="flex-1 flex flex-col relative z-10 min-w-0">
-        {/* Top bar */}
-        <div className="px-3 sm:px-4 py-2 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md">
+        {/* Top bar - higher z-index to stay above tool content */}
+        <div className="px-3 sm:px-4 py-2 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md relative z-30">
           <div className="flex items-center gap-2">
             {isMobile && (
               <button onClick={() => setMobileNavOpen(true)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
@@ -57,7 +59,7 @@ const Dashboard: React.FC = () => {
           <TopBar />
         </div>
 
-        <div className="flex-1 overflow-hidden bg-card/60 backdrop-blur-sm">
+        <div className="flex-1 overflow-hidden bg-card/60 backdrop-blur-sm relative z-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentTool}
