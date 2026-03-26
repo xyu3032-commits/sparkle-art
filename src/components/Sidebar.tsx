@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Image, Film, Video, Music, Settings, Download, Sparkles, User } from 'lucide-react';
+import { MessageSquare, Image, Film, Video, Music, Settings, Download, Sparkles, User, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 
@@ -10,6 +10,7 @@ const toolItems = [
   { id: 'textToVideo', icon: Film, labelKey: 'textToVideo' },
   { id: 'imageToVideo', icon: Video, labelKey: 'imageToVideo' },
   { id: 'audioGen', icon: Music, labelKey: 'audioGen' },
+  { id: 'promptLib', icon: BookOpen, labelKey: 'promptLibrary' },
 ];
 
 const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
