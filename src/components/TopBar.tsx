@@ -1,23 +1,39 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, User, BookOpen, Info, ChevronDown, Key } from 'lucide-react';
+import { HelpCircle, User, BookOpen, Info, ChevronDown, Key, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
+import { useChatStore } from '@/lib/chatStore';
 import ProfilePanel from './ProfilePanel';
 import ApiManager from './ApiManager';
 
 const TopBar: React.FC = () => {
   const { t } = useTranslation();
-  const { user, setUserCenterOpen } = useAppStore();
+  const { user, setUserCenterOpen, currentTool } = useAppStore();
+  const { createSession } = useChatStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [apiManagerOpen, setApiManagerOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
 
+  const handleNewChat = () => {
+    createSession(currentTool);
+  };
+
   return (
     <>
-      <div className="flex items-center gap-1.5">
-        {/* API Manager quick button */}
+      <div className="flex items-center gap-1">
+        {/* New Chat */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={handleNewChat}
+          className="p-2 rounded-xl hover:bg-secondary transition-colors"
+          title={t('newChat')}
+        >
+          <Plus className="w-4 h-4 text-muted-foreground" />
+        </motion.button>
+
+        {/* API Manager */}
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => setApiManagerOpen(true)}
@@ -31,25 +47,22 @@ const TopBar: React.FC = () => {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => setTutorialOpen(true)}
-          className="p-2 rounded-xl hover:bg-secondary transition-colors"
+          className="p-2 rounded-xl hover:bg-secondary transition-colors hidden sm:flex"
           title={t('tutorial')}
         >
           <BookOpen className="w-4 h-4 text-muted-foreground" />
         </motion.button>
 
-        {/* User avatar dropdown */}
+        {/* User dropdown */}
         <div className="relative">
           <motion.button
             whileTap={{ scale: 0.92 }}
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex items-center gap-1.5 px-2 py-1.5 rounded-xl hover:bg-secondary transition-colors"
+            className="flex items-center gap-1 px-1.5 py-1.5 rounded-xl hover:bg-secondary transition-colors"
           >
-            <div className="w-7 h-7 rounded-lg gradient-bg flex items-center justify-center">
-              <User className="w-3.5 h-3.5 text-primary-foreground" />
+            <div className="w-6 h-6 rounded-lg gradient-bg flex items-center justify-center">
+              <User className="w-3 h-3 text-primary-foreground" />
             </div>
-            <span className="text-xs font-medium text-card-foreground hidden sm:block max-w-[80px] truncate">
-              {user?.username || t('guest')}
-            </span>
             <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} />
           </motion.button>
 
@@ -68,34 +81,38 @@ const TopBar: React.FC = () => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1.5 w-48 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
+                  className="absolute right-0 top-full mt-1.5 w-44 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
                 >
+                  <div className="px-3 py-2 border-b border-border">
+                    <p className="text-xs font-medium text-card-foreground truncate">{user?.username || t('guest')}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{user?.email || ''}</p>
+                  </div>
                   <button
                     onClick={() => { setMenuOpen(false); setProfileOpen(true); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-card-foreground hover:bg-secondary transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors"
                   >
-                    <User className="w-4 h-4 text-muted-foreground" />
+                    <User className="w-3.5 h-3.5 text-muted-foreground" />
                     {t('profileSettings')}
                   </button>
                   <button
                     onClick={() => { setMenuOpen(false); setUserCenterOpen(true); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-card-foreground hover:bg-secondary transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors"
                   >
-                    <Info className="w-4 h-4 text-muted-foreground" />
+                    <Info className="w-3.5 h-3.5 text-muted-foreground" />
                     {t('userCenter')}
                   </button>
                   <button
                     onClick={() => { setMenuOpen(false); setApiManagerOpen(true); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-card-foreground hover:bg-secondary transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors"
                   >
-                    <Key className="w-4 h-4 text-muted-foreground" />
+                    <Key className="w-3.5 h-3.5 text-muted-foreground" />
                     {t('apiManager')}
                   </button>
                   <button
                     onClick={() => { setMenuOpen(false); setTutorialOpen(true); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-card-foreground hover:bg-secondary transition-colors border-t border-border"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors border-t border-border"
                   >
-                    <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                    <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
                     {t('help')}
                   </button>
                 </motion.div>
@@ -135,7 +152,7 @@ const TopBar: React.FC = () => {
                   <motion.span whileTap={{ scale: 0.9 }}>✕</motion.span>
                 </button>
               </div>
-              <div className="p-4 space-y-4">
+              <div className="p-4 space-y-3">
                 {[
                   { icon: '💬', title: t('textGen'), desc: t('tutorialText') },
                   { icon: '🎨', title: t('imageGen'), desc: t('tutorialImage') },
@@ -147,10 +164,10 @@ const TopBar: React.FC = () => {
                     key={i}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.08 }}
+                    transition={{ delay: i * 0.06 }}
                     className="flex gap-3 p-3 rounded-xl bg-secondary/50 border border-border"
                   >
-                    <span className="text-xl">{item.icon}</span>
+                    <span className="text-lg">{item.icon}</span>
                     <div>
                       <p className="text-sm font-medium text-card-foreground">{item.title}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
