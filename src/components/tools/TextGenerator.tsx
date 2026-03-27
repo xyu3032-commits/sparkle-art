@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, Loader2, ChevronDown, Check, Cpu, Plus, History } from 'lucide-react';
+import { Send, Bot, User, Loader2, ChevronDown, Check, Cpu, Plus, History, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, defaultApis } from '@/lib/store';
 import { useChatStore } from '@/lib/chatStore';
@@ -17,19 +17,22 @@ const TextGenerator: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { trackUsage, getActiveApiForTool, customApis, activeApis, setActiveApi, setUserCenterOpen, user } = useAppStore();
-  const { currentSessionId, createSession, updateMessages, getCurrentSession, setCurrentSession } = useChatStore();
+  const { currentSessionId, createSession, updateMessages, getCurrentSession } = useChatStore();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [apiDropdown, setApiDropdown] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [showParams, setShowParams] = useState(false);
+  const [temperature, setTemperature] = useState(() => parseFloat(localStorage.getItem('ai-param-temperature') || '0.7'));
+  const [topP, setTopP] = useState(() => parseFloat(localStorage.getItem('ai-param-top-p') || '0.9'));
+  const [maxTokens, setMaxTokens] = useState(() => parseInt(localStorage.getItem('ai-param-max-tokens') || '2048'));
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const allApis = [...defaultApis, ...customApis].filter(a => a.toolId === 'textGen');
   const api = getActiveApiForTool('textGen');
 
-  // Load session messages when session changes
   useEffect(() => {
     const session = getCurrentSession();
     if (session && session.toolId === 'textGen') {
@@ -43,12 +46,7 @@ const TextGenerator: React.FC = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages]);
 
-  // Save messages to current session
-  const saveMessages = useCallback((msgs: Message[]) => {
-    if (currentSessionId) {
-      updateMessages(currentSessionId, msgs);
-    }
-  }, [currentSessionId, updateMessages]);
+  const saveParam = (key: string, val: string) => localStorage.setItem(key, val);
 
   const handleNewChat = () => {
     createSession('textGen');
@@ -58,7 +56,6 @@ const TextGenerator: React.FC = () => {
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     
-    // Auto-create session if none
     let sessionId = currentSessionId;
     if (!sessionId) {
       sessionId = createSession('textGen');
@@ -69,8 +66,6 @@ const TextGenerator: React.FC = () => {
     setMessages(newMessages);
     setInput('');
     setLoading(true);
-
-    // Save user message immediately
     updateMessages(sessionId, newMessages);
 
     const apiKey = api?.apiKey || 'sk-xgovryksordjmsdfkihbgculbjfknsgzgvlkalqbxzgoklok';
@@ -81,7 +76,14 @@ const TextGenerator: React.FC = () => {
       const res = await fetch(`${baseUrl}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({ model, messages: newMessages.map((m) => ({ role: m.role, content: m.content })), stream: true }),
+        body: JSON.stringify({
+          model,
+          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
+          stream: true,
+          temperature,
+          top_p: topP,
+          max_tokens: maxTokens,
+        }),
       });
       if (!res.ok) throw new Error(`API error: ${res.status}`);
 
@@ -145,6 +147,10 @@ const TextGenerator: React.FC = () => {
           <h2 className="font-semibold text-card-foreground text-sm truncate">{t('textGen')}</h2>
         </div>
         <div className="flex items-center gap-1">
+          <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowParams(!showParams)}
+            className={`p-1.5 rounded-lg transition-colors ${showParams ? 'bg-primary/10 text-primary' : 'hover:bg-secondary'}`} title={t('advancedParams')}>
+            <Settings2 className="w-4 h-4" />
+          </motion.button>
           <motion.button whileTap={{ scale: 0.95 }} onClick={handleNewChat}
             className="p-1.5 rounded-lg hover:bg-secondary transition-colors" title={t('newChat')}>
             <Plus className="w-4 h-4 text-muted-foreground" />
@@ -183,6 +189,38 @@ const TextGenerator: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Advanced Parameters */}
+      <AnimatePresence>
+        {showParams && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            className="border-b border-border overflow-hidden">
+            <div className="px-3 sm:px-4 py-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Temperature</span>
+                <span className="text-xs font-mono font-bold text-foreground">{temperature.toFixed(1)}</span>
+              </div>
+              <input type="range" min="0" max="2" step="0.1" value={temperature}
+                onChange={e => { setTemperature(+e.target.value); saveParam('ai-param-temperature', e.target.value); }}
+                className="w-full accent-[hsl(var(--primary))] h-1.5" />
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Top P</span>
+                <span className="text-xs font-mono font-bold text-foreground">{topP.toFixed(2)}</span>
+              </div>
+              <input type="range" min="0" max="1" step="0.05" value={topP}
+                onChange={e => { setTopP(+e.target.value); saveParam('ai-param-top-p', e.target.value); }}
+                className="w-full accent-[hsl(var(--primary))] h-1.5" />
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Max Tokens</span>
+                <span className="text-xs font-mono font-bold text-foreground">{maxTokens}</span>
+              </div>
+              <input type="range" min="256" max="8192" step="256" value={maxTokens}
+                onChange={e => { setMaxTokens(+e.target.value); saveParam('ai-param-max-tokens', e.target.value); }}
+                className="w-full accent-[hsl(var(--primary))] h-1.5" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-thin p-3 sm:p-4 space-y-3">

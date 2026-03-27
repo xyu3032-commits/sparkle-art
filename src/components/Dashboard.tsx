@@ -7,6 +7,7 @@ import MobileNav from '@/components/MobileNav';
 import SettingsPanel from '@/components/SettingsPanel';
 import UserCenter from '@/components/UserCenter';
 import TopBar from '@/components/TopBar';
+import QuickToolbar from '@/components/QuickToolbar';
 import BotCheck, { needsBotCheck, markBotCheckPassed } from '@/components/BotCheck';
 import TextGenerator from '@/components/tools/TextGenerator';
 import ImageGenerator from '@/components/tools/ImageGenerator';
@@ -47,7 +48,6 @@ const Dashboard: React.FC = () => {
       {isMobile && <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />}
 
       <div className="flex-1 flex flex-col relative z-10 min-w-0">
-        {/* Top bar - higher z-index to stay above tool content */}
         <div className="px-3 sm:px-4 py-2 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md relative z-30">
           <div className="flex items-center gap-2">
             {isMobile && (
@@ -75,6 +75,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      <QuickToolbar />
       <SettingsPanel />
       <UserCenter />
 
