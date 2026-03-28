@@ -6,6 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { useChatStore } from '@/lib/chatStore';
 import ProfilePanel from './ProfilePanel';
 import ApiManager from './ApiManager';
+import ThemeSwitcher from './ThemeSwitcher';
 
 const TopBar: React.FC = () => {
   const { t } = useTranslation();
@@ -22,7 +23,9 @@ const TopBar: React.FC = () => {
 
   return (
     <>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
+        {/* Theme Switcher */}
+        <ThemeSwitcher />
         {/* New Chat */}
         <motion.button
           whileTap={{ scale: 0.92 }}
