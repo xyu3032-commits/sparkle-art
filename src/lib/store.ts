@@ -19,9 +19,12 @@ interface ApiConfig {
   toolId: string;
 }
 
+type ThemePreset = 'alpine' | 'midnight' | 'nebula' | 'parchment';
+
 interface AppState {
   deviceMode: 'desktop' | 'mobile' | null;
   theme: 'light' | 'dark';
+  themePreset: ThemePreset;
   language: string;
   backgroundUrl: string;
   currentTool: string;
@@ -30,10 +33,11 @@ interface AppState {
   usageStats: UsageStats;
   user: UserInfo | null;
   customApis: ApiConfig[];
-  activeApis: Record<string, string>; // toolId -> apiConfig id
+  activeApis: Record<string, string>;
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
   resetDeviceMode: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
+  setThemePreset: (preset: ThemePreset) => void;
   setLanguage: (lang: string) => void;
   setBackgroundUrl: (url: string) => void;
   setCurrentTool: (tool: string) => void;
@@ -75,6 +79,7 @@ const defaultApis: ApiConfig[] = [
 export const useAppStore = create<AppState>((set, get) => ({
   deviceMode: localStorage.getItem('ai-device-mode') as 'desktop' | 'mobile' | null,
   theme: (localStorage.getItem('ai-theme') as 'light' | 'dark') || 'light',
+  themePreset: (localStorage.getItem('ai-theme-preset') as ThemePreset) || 'alpine',
   language: localStorage.getItem('ai-platform-lang') || 'zh',
   backgroundUrl: localStorage.getItem('ai-bg-url') || '',
   currentTool: 'textGen',
@@ -96,6 +101,17 @@ export const useAppStore = create<AppState>((set, get) => ({
     localStorage.setItem('ai-theme', theme);
     document.documentElement.classList.toggle('dark', theme === 'dark');
     set({ theme });
+  },
+  setThemePreset: (preset) => {
+    localStorage.setItem('ai-theme-preset', preset);
+    // Remove all theme classes
+    document.documentElement.classList.remove('theme-alpine', 'theme-midnight', 'theme-nebula', 'theme-parchment', 'dark');
+    // Apply the new theme class
+    document.documentElement.classList.add(`theme-${preset}`);
+    // Set dark/light mode based on preset
+    const isDark = preset === 'midnight' || preset === 'nebula';
+    localStorage.setItem('ai-theme', isDark ? 'dark' : 'light');
+    set({ themePreset: preset, theme: isDark ? 'dark' : 'light' });
   },
   setLanguage: (lang) => {
     localStorage.setItem('ai-platform-lang', lang);

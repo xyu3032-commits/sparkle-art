@@ -6,14 +6,19 @@ import DeviceSelect from '@/components/DeviceSelect';
 import Dashboard from '@/components/Dashboard';
 
 const Index: React.FC = () => {
-  const { deviceMode, theme, user } = useAppStore();
+  const { deviceMode, theme, themePreset, user } = useAppStore();
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    // Apply theme preset class on mount
+    document.documentElement.classList.remove('theme-alpine', 'theme-midnight', 'theme-nebula', 'theme-parchment', 'dark');
+    document.documentElement.classList.add(`theme-${themePreset}`);
+    if (themePreset === 'midnight' || themePreset === 'nebula') {
+      // dark themes handled by CSS class
+    }
     setMounted(true);
-  }, [theme]);
+  }, [theme, themePreset]);
 
   useEffect(() => {
     if (mounted && !user) {

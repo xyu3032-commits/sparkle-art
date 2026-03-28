@@ -171,24 +171,26 @@ const PromptLibrary: React.FC = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
+                      whileHover={{ scale: 1.02, transition: { type: 'spring', stiffness: 400, damping: 20 } }}
+                      whileTap={{ scale: 0.98 }}
                       transition={{ delay: i * 0.03 }}
                       onClick={() => openPrompt(p)}
-                      className="group cursor-pointer p-3 rounded-xl border border-border bg-card hover:border-primary/30 hover:shadow-md transition-all duration-200"
+                      className="group cursor-pointer p-4 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-lg transition-all duration-300"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-sm font-semibold text-card-foreground truncate flex-1">{p.title}</h3>
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-1" />
+                      <div className="flex items-start justify-between mb-2.5">
+                        <h3 className="text-sm font-bold text-card-foreground truncate flex-1">{p.title}</h3>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0 ml-1" />
                       </div>
-                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{p.description}</p>
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2 leading-relaxed">{p.description}</p>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">{p.category}</span>
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-primary/10 text-primary">{p.category}</span>
                         {p.tags.slice(0, 2).map((tag) => (
-                          <span key={tag} className="px-1.5 py-0.5 rounded text-[10px] bg-secondary text-muted-foreground">
+                          <span key={tag} className="px-2 py-0.5 rounded-md text-[10px] bg-secondary text-muted-foreground">
                             {tag}
                           </span>
                         ))}
                         {extractVariables(p.content).length > 0 && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-accent/10 text-accent flex items-center gap-0.5">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] bg-accent/10 text-accent flex items-center gap-0.5 font-medium">
                             <Sparkles className="w-2.5 h-2.5" />
                             {extractVariables(p.content).length}
                           </span>

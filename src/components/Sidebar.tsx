@@ -48,6 +48,7 @@ const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
             <motion.button
               key={item.id}
               whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.02, transition: { type: 'spring', stiffness: 400, damping: 20 } }}
               onClick={() => setCurrentTool(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200
                 ${active ? 'gradient-bg text-primary-foreground shadow-glow' : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'}`}
