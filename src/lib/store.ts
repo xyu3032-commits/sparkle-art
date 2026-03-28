@@ -19,9 +19,12 @@ interface ApiConfig {
   toolId: string;
 }
 
+type ThemePreset = 'alpine' | 'midnight' | 'nebula' | 'parchment';
+
 interface AppState {
   deviceMode: 'desktop' | 'mobile' | null;
   theme: 'light' | 'dark';
+  themePreset: ThemePreset;
   language: string;
   backgroundUrl: string;
   currentTool: string;
@@ -30,10 +33,11 @@ interface AppState {
   usageStats: UsageStats;
   user: UserInfo | null;
   customApis: ApiConfig[];
-  activeApis: Record<string, string>; // toolId -> apiConfig id
+  activeApis: Record<string, string>;
   setDeviceMode: (mode: 'desktop' | 'mobile') => void;
   resetDeviceMode: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
+  setThemePreset: (preset: ThemePreset) => void;
   setLanguage: (lang: string) => void;
   setBackgroundUrl: (url: string) => void;
   setCurrentTool: (tool: string) => void;
