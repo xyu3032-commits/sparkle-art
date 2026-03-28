@@ -99,8 +99,22 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   setTheme: (theme) => {
     localStorage.setItem('ai-theme', theme);
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    set({ theme });
+    // Map light/dark to corresponding preset
+    const currentPreset = get().themePreset;
+    document.documentElement.classList.remove('theme-alpine', 'theme-midnight', 'theme-nebula', 'theme-parchment', 'dark');
+    if (theme === 'dark') {
+      // If currently on a light preset, switch to midnight
+      const darkPreset = (currentPreset === 'alpine' || currentPreset === 'parchment') ? 'midnight' : currentPreset;
+      document.documentElement.classList.add(`theme-${darkPreset}`);
+      localStorage.setItem('ai-theme-preset', darkPreset);
+      set({ theme, themePreset: darkPreset });
+    } else {
+      // If currently on a dark preset, switch to alpine
+      const lightPreset = (currentPreset === 'midnight' || currentPreset === 'nebula') ? 'alpine' : currentPreset;
+      document.documentElement.classList.add(`theme-${lightPreset}`);
+      localStorage.setItem('ai-theme-preset', lightPreset);
+      set({ theme, themePreset: lightPreset });
+    }
   },
   setThemePreset: (preset) => {
     localStorage.setItem('ai-theme-preset', preset);
