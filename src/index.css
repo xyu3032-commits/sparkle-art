@@ -132,3 +132,33 @@
     border-radius: 2px;
   }
 }
+
+/* Nebula animated mesh gradient background */
+.theme-nebula body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 50%, hsl(280 80% 40% / 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, hsl(190 90% 40% / 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, hsl(260 70% 50% / 0.1) 0%, transparent 50%);
+  animation: nebula-drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes nebula-drift {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(30deg); }
+}
+
+/* Parchment neumorphism buttons */
+.theme-parchment .neu-btn {
+  box-shadow:
+    3px 3px 6px hsl(30 15% 15% / 0.08),
+    -3px -3px 6px hsl(0 0% 100% / 0.7);
+}
+.theme-parchment .neu-btn:active {
+  box-shadow:
+    inset 2px 2px 4px hsl(30 15% 15% / 0.08),
+    inset -2px -2px 4px hsl(0 0% 100% / 0.5);
+}
