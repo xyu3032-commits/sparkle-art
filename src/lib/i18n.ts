@@ -408,6 +408,7 @@ const adminKeys = {
     chatCleared: "Chat limpiado",
     shareLink: "Compartir enlace",
     linkCopied: "Enlace copiado",
+    adminNotices: "Avisos", addNotice: "Añadir", noticeTitle: "Título", noticeContent: "Contenido", publishNotice: "Publicar", titleRequired: "Título requerido", noticeAdded: "Publicado", noNotices: "Sin avisos", systemNotice: "Aviso", glassEffect: "Efecto cristal", editUser: "Editar", deleteUser: "Eliminar", userDeleted: "Eliminado", userUpdated: "Actualizado", memberStyle: "Estilo", styleDefault: "Predeterminado", styleGold: "Oro", styleDiamond: "Diamante", styleRainbow: "Arcoíris", save: "Guardar", memberBenefits: "Beneficios", guestBenefit1: "5 generaciones/día", guestBenefit2: "Texto básico", freeBenefit1: "100 generaciones/día", freeBenefit2: "Texto e imagen", freeBenefit3: "Parámetros básicos", proBenefit1: "1000 generaciones/día", proBenefit2: "Todas las herramientas", proBenefit3: "Parámetros avanzados", proBenefit4: "Cola prioritaria", lifetimeBenefit1: "Ilimitado para siempre", lifetimeBenefit2: "Todas las herramientas", lifetimeBenefit3: "Máxima prioridad", lifetimeBenefit4: "Estilo exclusivo",
   },
 };
 
