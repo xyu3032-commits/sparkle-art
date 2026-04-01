@@ -200,6 +200,18 @@
   .surface-elevated {
     background: hsl(var(--surface-elevated));
   }
+
+  /* Glass mode cards */
+  .admin-glass-card {
+    background: hsl(var(--card));
+  }
+  .glass-mode .admin-glass-card {
+    background: hsl(var(--surface-glass));
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-color: hsl(var(--border) / 0.5);
+  }
+
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
