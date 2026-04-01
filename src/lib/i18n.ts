@@ -294,6 +294,7 @@ const adminKeys = {
     chatCleared: "삭제됨",
     shareLink: "링크 공유",
     linkCopied: "링크 복사됨",
+    adminNotices: "공지", addNotice: "추가", noticeTitle: "제목", noticeContent: "내용", publishNotice: "게시", titleRequired: "제목 필요", noticeAdded: "게시됨", noNotices: "공지 없음", systemNotice: "공지", glassEffect: "글래스 효과", editUser: "편집", deleteUser: "삭제", userDeleted: "삭제됨", userUpdated: "업데이트됨", memberStyle: "스타일", styleDefault: "기본", styleGold: "골드", styleDiamond: "다이아몬드", styleRainbow: "레인보우", save: "저장", memberBenefits: "혜택", guestBenefit1: "매일 5회 무료", guestBenefit2: "기본 텍스트", freeBenefit1: "매일 100회", freeBenefit2: "텍스트&이미지", freeBenefit3: "기본 파라미터", proBenefit1: "매일 1000회", proBenefit2: "전체 도구", proBenefit3: "고급 파라미터", proBenefit4: "우선 대기열", lifetimeBenefit1: "영구 무제한", lifetimeBenefit2: "전체 도구", lifetimeBenefit3: "최고 우선순위", lifetimeBenefit4: "전용 스타일",
   },
   fr: {
     adminPanel: "Panneau Admin",
