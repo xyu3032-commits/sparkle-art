@@ -237,6 +237,7 @@ const adminKeys = {
     chatCleared: "クリアしました",
     shareLink: "リンク共有",
     linkCopied: "リンクコピー済み",
+    adminNotices: "お知らせ", addNotice: "追加", noticeTitle: "タイトル", noticeContent: "内容", publishNotice: "公開", titleRequired: "タイトル必須", noticeAdded: "公開済み", noNotices: "お知らせなし", systemNotice: "お知らせ", glassEffect: "ガラス効果", editUser: "編集", deleteUser: "削除", userDeleted: "削除済み", userUpdated: "更新済み", memberStyle: "スタイル", styleDefault: "デフォルト", styleGold: "ゴールド", styleDiamond: "ダイヤモンド", styleRainbow: "レインボー", save: "保存", memberBenefits: "特典", guestBenefit1: "毎日5回無料", guestBenefit2: "基本テキスト生成", freeBenefit1: "毎日100回", freeBenefit2: "テキスト&画像", freeBenefit3: "基本パラメータ", proBenefit1: "毎日1000回", proBenefit2: "全ツール無制限", proBenefit3: "高度なパラメータ", proBenefit4: "優先キュー", lifetimeBenefit1: "永久無制限", lifetimeBenefit2: "全ツール無制限", lifetimeBenefit3: "最高優先度", lifetimeBenefit4: "専用スタイル",
   },
   ko: {
     adminPanel: "관리자 패널",
