@@ -10,6 +10,7 @@ export interface ManagedUser {
   banned: boolean;
   createdAt: number;
   expiresAt: number | null;
+  memberStyle?: string;
 }
 
 export interface Voucher {
@@ -27,7 +28,15 @@ export interface Voucher {
 export interface ModelConfig {
   toolId: string;
   enabled: boolean;
-  weight: number; // consumption weight per use
+  weight: number;
+}
+
+export interface Notice {
+  id: string;
+  title: string;
+  content: string;
+  enabled: boolean;
+  createdAt: number;
 }
 
 interface AdminState {
@@ -35,15 +44,22 @@ interface AdminState {
   users: ManagedUser[];
   vouchers: Voucher[];
   modelConfigs: ModelConfig[];
+  notices: Notice[];
+  glassEffect: boolean;
   adminLogin: (password: string) => boolean;
   adminLogout: () => void;
   addUser: (user: Omit<ManagedUser, 'id' | 'createdAt'>) => void;
   updateUser: (id: string, updates: Partial<ManagedUser>) => void;
+  deleteUser: (id: string) => void;
   banUser: (id: string) => void;
   unbanUser: (id: string) => void;
   generateVouchers: (batch: string, type: 'quota' | 'days', value: number, count: number, expiresInDays: number) => Voucher[];
   redeemVoucher: (code: string, userId: string) => { success: boolean; message: string };
   setModelConfig: (toolId: string, updates: Partial<ModelConfig>) => void;
+  addNotice: (title: string, content: string) => void;
+  updateNotice: (id: string, updates: Partial<Notice>) => void;
+  deleteNotice: (id: string) => void;
+  setGlassEffect: (enabled: boolean) => void;
   getStats: () => { totalUsers: number; totalGenerations: number; todayActive: number };
 }
 
@@ -69,12 +85,16 @@ function generateCode(): string {
 const savedUsers = JSON.parse(localStorage.getItem('admin-users') || '[]');
 const savedVouchers = JSON.parse(localStorage.getItem('admin-vouchers') || '[]');
 const savedModelConfigs = JSON.parse(localStorage.getItem('admin-model-configs') || 'null');
+const savedNotices = JSON.parse(localStorage.getItem('admin-notices') || '[]');
+const savedGlass = localStorage.getItem('admin-glass-effect') === 'true';
 
 export const useAdminStore = create<AdminState>((set, get) => ({
   isAdminLoggedIn: localStorage.getItem('admin-logged-in') === 'true',
   users: savedUsers,
   vouchers: savedVouchers,
   modelConfigs: savedModelConfigs || defaultModelConfigs,
+  notices: savedNotices,
+  glassEffect: savedGlass,
 
   adminLogin: (password) => {
     if (password === ADMIN_PASSWORD) {
@@ -103,6 +123,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     return { users };
   }),
 
+  deleteUser: (id) => set((state) => {
+    const users = state.users.filter(u => u.id !== id);
+    localStorage.setItem('admin-users', JSON.stringify(users));
+    return { users };
+  }),
+
   banUser: (id) => set((state) => {
     const users = state.users.map(u => u.id === id ? { ...u, banned: true } : u);
     localStorage.setItem('admin-users', JSON.stringify(users));
@@ -117,10 +143,14 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   generateVouchers: (batch, type, value, count, expiresInDays) => {
     const newVouchers: Voucher[] = [];
+    const existingCodes = new Set(get().vouchers.map(v => v.code));
     for (let i = 0; i < count; i++) {
+      let code = generateCode();
+      while (existingCodes.has(code)) code = generateCode();
+      existingCodes.add(code);
       newVouchers.push({
         id: crypto.randomUUID(),
-        code: generateCode(),
+        code,
         type,
         value,
         batch,
@@ -140,7 +170,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   redeemVoucher: (code, userId) => {
     const state = get();
-    const voucher = state.vouchers.find(v => v.code === code.toUpperCase().trim());
+    const normalizedCode = code.toUpperCase().trim().replace(/\s+/g, '');
+    const voucher = state.vouchers.find(v => v.code === normalizedCode);
     if (!voucher) return { success: false, message: 'invalidCode' };
     if (voucher.used) return { success: false, message: 'codeUsed' };
     if (Date.now() > voucher.expiresAt) return { success: false, message: 'codeExpired' };
@@ -150,6 +181,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     );
     localStorage.setItem('admin-vouchers', JSON.stringify(vouchers));
     set({ vouchers });
+
+    // Apply voucher effect to localStorage for user
+    if (voucher.type === 'quota') {
+      const current = parseInt(localStorage.getItem('ai-user-quota') || '100');
+      localStorage.setItem('ai-user-quota', String(current + voucher.value));
+    } else if (voucher.type === 'days') {
+      const exp = new Date();
+      exp.setDate(exp.getDate() + voucher.value);
+      localStorage.setItem('ai-user-expiry', exp.toISOString());
+      localStorage.setItem('ai-user-level', 'pro');
+    }
 
     return { success: true, message: `redeemed:${voucher.type}:${voucher.value}` };
   },
@@ -161,6 +203,35 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     localStorage.setItem('admin-model-configs', JSON.stringify(configs));
     return { modelConfigs: configs };
   }),
+
+  addNotice: (title, content) => set((state) => {
+    const notice: Notice = { id: crypto.randomUUID(), title, content, enabled: true, createdAt: Date.now() };
+    const notices = [notice, ...state.notices];
+    localStorage.setItem('admin-notices', JSON.stringify(notices));
+    return { notices };
+  }),
+
+  updateNotice: (id, updates) => set((state) => {
+    const notices = state.notices.map(n => n.id === id ? { ...n, ...updates } : n);
+    localStorage.setItem('admin-notices', JSON.stringify(notices));
+    return { notices };
+  }),
+
+  deleteNotice: (id) => set((state) => {
+    const notices = state.notices.filter(n => n.id !== id);
+    localStorage.setItem('admin-notices', JSON.stringify(notices));
+    return { notices };
+  }),
+
+  setGlassEffect: (enabled) => {
+    localStorage.setItem('admin-glass-effect', String(enabled));
+    if (enabled) {
+      document.documentElement.classList.add('glass-mode');
+    } else {
+      document.documentElement.classList.remove('glass-mode');
+    }
+    set({ glassEffect: enabled });
+  },
 
   getStats: () => {
     const state = get();
