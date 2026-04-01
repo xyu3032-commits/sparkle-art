@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, Lock, Users, BarChart3, Ticket, Cpu, LogOut, ArrowLeft,
-  Plus, Ban, CheckCircle, Download, Search, Settings2, ToggleLeft, ToggleRight,
-  TrendingUp, UserPlus, Trash2, Eye
+  Plus, Ban, CheckCircle, Download, Search, ToggleLeft, ToggleRight,
+  TrendingUp, UserPlus, Trash2, Edit3, Megaphone, GlassWater, Save, X,
+  Crown, Star, Gem, Eye, EyeOff
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useAdminStore, type ManagedUser, type Voucher } from '@/lib/adminStore';
+import { useAdminStore, type ManagedUser } from '@/lib/adminStore';
 import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 
-type Tab = 'dashboard' | 'users' | 'vouchers' | 'models' | 'apis';
+type Tab = 'dashboard' | 'users' | 'vouchers' | 'models' | 'notices';
 
 const Admin: React.FC = () => {
   const { t } = useTranslation();
@@ -24,6 +25,11 @@ const Admin: React.FC = () => {
   React.useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  // Init glass mode
+  React.useEffect(() => {
+    if (admin.glassEffect) document.documentElement.classList.add('glass-mode');
+  }, []);
 
   if (!admin.isAdminLoggedIn) {
     return (
@@ -60,12 +66,12 @@ const Admin: React.FC = () => {
     { id: 'users', icon: Users, label: t('adminUsers') },
     { id: 'vouchers', icon: Ticket, label: t('adminVouchers') },
     { id: 'models', icon: Cpu, label: t('adminModels') },
+    { id: 'notices', icon: Megaphone, label: t('adminNotices') },
   ];
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="w-56 bg-card border-r border-border flex flex-col max-md:hidden">
+      <aside className="w-56 admin-glass-card border-r border-border flex flex-col max-md:hidden">
         <div className="p-4 border-b border-border flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
             <Shield className="w-4 h-4 text-primary-foreground" />
@@ -75,7 +81,7 @@ const Admin: React.FC = () => {
         <nav className="flex-1 p-2 space-y-1">
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
                 ${activeTab === tab.id ? 'gradient-bg text-primary-foreground shadow-glow' : 'text-muted-foreground hover:bg-secondary'}`}>
               <tab.icon className="w-4 h-4" />
               {tab.label}
@@ -83,6 +89,13 @@ const Admin: React.FC = () => {
           ))}
         </nav>
         <div className="p-2 border-t border-border space-y-1">
+          {/* Glass toggle */}
+          <button onClick={() => admin.setGlassEffect(!admin.glassEffect)}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-secondary transition-colors">
+            <GlassWater className="w-4 h-4" />
+            <span className="flex-1 text-left">{t('glassEffect')}</span>
+            {admin.glassEffect ? <ToggleRight className="w-5 h-5 text-primary" /> : <ToggleLeft className="w-5 h-5" />}
+          </button>
           <button onClick={() => navigate('/')} className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-secondary transition-colors">
             <ArrowLeft className="w-4 h-4" /> {t('backToApp')}
           </button>
@@ -93,7 +106,7 @@ const Admin: React.FC = () => {
       </aside>
 
       {/* Mobile tabs */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 flex">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 admin-glass-card border-t border-border z-40 flex">
         {tabs.map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] transition-colors ${activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -103,7 +116,6 @@ const Admin: React.FC = () => {
         ))}
       </div>
 
-      {/* Content */}
       <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
@@ -111,6 +123,7 @@ const Admin: React.FC = () => {
             {activeTab === 'users' && <UsersTab />}
             {activeTab === 'vouchers' && <VouchersTab />}
             {activeTab === 'models' && <ModelsTab />}
+            {activeTab === 'notices' && <NoticesTab />}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -118,16 +131,15 @@ const Admin: React.FC = () => {
   );
 };
 
+/* ===== Dashboard ===== */
 const DashboardTab: React.FC<{ stats: { totalUsers: number; totalGenerations: number; todayActive: number } }> = ({ stats }) => {
   const { t } = useTranslation();
   const allStats = JSON.parse(localStorage.getItem('ai-usage-stats') || '{}');
-
   const statCards = [
     { label: t('totalUsersLabel'), value: stats.totalUsers, icon: Users, color: 'text-primary' },
     { label: t('totalGenerations'), value: stats.totalGenerations, icon: TrendingUp, color: 'text-accent' },
     { label: t('todayActive'), value: stats.todayActive, icon: BarChart3, color: 'text-green-500' },
   ];
-
   const toolStats = [
     { id: 'textGen', label: t('textGen'), count: allStats.textGen || 0 },
     { id: 'imageGen', label: t('imageGen'), count: allStats.imageGen || 0 },
@@ -142,7 +154,7 @@ const DashboardTab: React.FC<{ stats: { totalUsers: number; totalGenerations: nu
       <h1 className="text-lg font-bold text-foreground">{t('adminDashboard')}</h1>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {statCards.map((s, i) => (
-          <div key={i} className="bg-card border border-border rounded-2xl p-4">
+          <div key={i} className="admin-glass-card border border-border rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <s.icon className={`w-4 h-4 ${s.color}`} />
               <span className="text-xs text-muted-foreground">{s.label}</span>
@@ -151,7 +163,7 @@ const DashboardTab: React.FC<{ stats: { totalUsers: number; totalGenerations: nu
           </div>
         ))}
       </div>
-      <div className="bg-card border border-border rounded-2xl p-4">
+      <div className="admin-glass-card border border-border rounded-2xl p-4">
         <h3 className="text-sm font-semibold text-foreground mb-4">{t('usageBreakdown')}</h3>
         <div className="space-y-3">
           {toolStats.map(ts => (
@@ -173,11 +185,13 @@ const DashboardTab: React.FC<{ stats: { totalUsers: number; totalGenerations: nu
   );
 };
 
+/* ===== Users ===== */
 const UsersTab: React.FC = () => {
   const { t } = useTranslation();
-  const { users, addUser, updateUser, banUser, unbanUser } = useAdminStore();
+  const { users, addUser, updateUser, deleteUser, banUser, unbanUser } = useAdminStore();
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
+  const [editingUser, setEditingUser] = useState<ManagedUser | null>(null);
   const [newEmail, setNewEmail] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newLevel, setNewLevel] = useState<ManagedUser['level']>('free');
@@ -191,6 +205,27 @@ const UsersTab: React.FC = () => {
     toast.success(t('userAdded'));
   };
 
+  const handleDelete = (id: string) => {
+    deleteUser(id);
+    toast.success(t('userDeleted'));
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingUser) return;
+    updateUser(editingUser.id, {
+      email: editingUser.email,
+      username: editingUser.username,
+      level: editingUser.level,
+      quota: editingUser.quota,
+      memberStyle: editingUser.memberStyle,
+      expiresAt: editingUser.expiresAt,
+    });
+    setEditingUser(null);
+    toast.success(t('userUpdated'));
+  };
+
+  const levelIcons: Record<string, React.ElementType> = { free: Star, pro: Crown, lifetime: Gem };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
@@ -203,7 +238,7 @@ const UsersTab: React.FC = () => {
       <AnimatePresence>
         {showAdd && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-            className="bg-card border border-border rounded-xl p-3 space-y-2 overflow-hidden">
+            className="admin-glass-card border border-border rounded-xl p-3 space-y-2 overflow-hidden">
             <input value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder={t('emailPlaceholder')}
               className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
             <input value={newUsername} onChange={e => setNewUsername(e.target.value)} placeholder={t('usernamePlaceholder')}
@@ -215,9 +250,66 @@ const UsersTab: React.FC = () => {
               <option value="lifetime">{t('levelLifetime')}</option>
             </select>
             <div className="flex gap-2">
-              <button onClick={handleAdd} className="flex-1 py-2 rounded-lg gradient-bg text-primary-foreground text-sm font-medium">{t('addApi')}</button>
+              <button onClick={handleAdd} className="flex-1 py-2 rounded-lg gradient-bg text-primary-foreground text-sm font-medium">{t('addUser')}</button>
               <button onClick={() => setShowAdd(false)} className="flex-1 py-2 rounded-lg bg-secondary text-sm text-muted-foreground">{t('cancel')}</button>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit User Modal */}
+      <AnimatePresence>
+        {editingUser && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setEditingUser(null)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="admin-glass-card border border-border rounded-2xl p-5 w-full max-w-md space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-foreground">{t('editUser')}</h3>
+                <button onClick={() => setEditingUser(null)}><X className="w-4 h-4 text-muted-foreground" /></button>
+              </div>
+              <input value={editingUser.username} onChange={e => setEditingUser({ ...editingUser, username: e.target.value })}
+                placeholder={t('usernamePlaceholder')}
+                className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <input value={editingUser.email} onChange={e => setEditingUser({ ...editingUser, email: e.target.value })}
+                placeholder={t('emailPlaceholder')}
+                className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">{t('currentLevel')}</label>
+                  <select value={editingUser.level} onChange={e => setEditingUser({ ...editingUser, level: e.target.value as ManagedUser['level'] })}
+                    className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border">
+                    <option value="guest">{t('levelGuest')}</option>
+                    <option value="free">{t('levelFree')}</option>
+                    <option value="pro">{t('levelPro')}</option>
+                    <option value="lifetime">{t('levelLifetime')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">{t('remainQuota')}</label>
+                  <input type="number" value={editingUser.quota} onChange={e => setEditingUser({ ...editingUser, quota: +e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">{t('memberStyle')}</label>
+                <select value={editingUser.memberStyle || 'default'} onChange={e => setEditingUser({ ...editingUser, memberStyle: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border">
+                  <option value="default">{t('styleDefault')}</option>
+                  <option value="gold">{t('styleGold')}</option>
+                  <option value="diamond">{t('styleDiamond')}</option>
+                  <option value="rainbow">{t('styleRainbow')}</option>
+                </select>
+              </div>
+              <div className="flex gap-2 pt-1">
+                <button onClick={handleSaveEdit} className="flex-1 py-2 rounded-lg gradient-bg text-primary-foreground text-sm font-medium flex items-center justify-center gap-1">
+                  <Save className="w-3.5 h-3.5" /> {t('save')}
+                </button>
+                <button onClick={() => setEditingUser(null)} className="flex-1 py-2 rounded-lg bg-secondary text-sm text-muted-foreground">{t('cancel')}</button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -230,40 +322,59 @@ const UsersTab: React.FC = () => {
 
       <div className="space-y-2">
         {filtered.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">{t('noUsers')}</p>}
-        {filtered.map(user => (
-          <div key={user.id} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg gradient-bg flex items-center justify-center flex-shrink-0">
-              <Users className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user.username}</p>
-              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-            </div>
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-              user.level === 'pro' ? 'bg-primary/10 text-primary' :
-              user.level === 'lifetime' ? 'bg-accent/10 text-accent' :
-              'bg-secondary text-muted-foreground'
-            }`}>
-              {t(`level${user.level.charAt(0).toUpperCase() + user.level.slice(1)}`)}
-            </span>
-            <div className="flex gap-1">
-              {user.banned ? (
-                <button onClick={() => unbanUser(user.id)} className="p-1.5 rounded-lg hover:bg-green-500/10 transition-colors" title={t('unban')}>
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+        {filtered.map(user => {
+          const LevelIcon = levelIcons[user.level] || Star;
+          return (
+            <div key={user.id} className={`admin-glass-card border border-border rounded-xl p-3 flex items-center gap-3 ${user.banned ? 'opacity-50' : ''}`}>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                user.memberStyle === 'gold' ? 'bg-amber-500/20' :
+                user.memberStyle === 'diamond' ? 'bg-cyan-500/20' :
+                user.memberStyle === 'rainbow' ? 'bg-gradient-to-br from-pink-500/20 via-purple-500/20 to-cyan-500/20' :
+                'gradient-bg'
+              }`}>
+                <LevelIcon className={`w-4 h-4 ${
+                  user.memberStyle === 'gold' ? 'text-amber-500' :
+                  user.memberStyle === 'diamond' ? 'text-cyan-400' :
+                  'text-primary-foreground'
+                }`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{user.username}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email} · {t('remainQuota')}: {user.quota - user.usedQuota}</p>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                user.level === 'pro' ? 'bg-primary/10 text-primary' :
+                user.level === 'lifetime' ? 'bg-accent/10 text-accent' :
+                'bg-secondary text-muted-foreground'
+              }`}>
+                {t(`level${user.level.charAt(0).toUpperCase() + user.level.slice(1)}`)}
+              </span>
+              <div className="flex gap-0.5">
+                <button onClick={() => setEditingUser({ ...user })} className="p-1.5 rounded-lg hover:bg-secondary transition-colors" title={t('editUser')}>
+                  <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
-              ) : (
-                <button onClick={() => banUser(user.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors" title={t('ban')}>
-                  <Ban className="w-4 h-4 text-destructive" />
+                {user.banned ? (
+                  <button onClick={() => unbanUser(user.id)} className="p-1.5 rounded-lg hover:bg-green-500/10 transition-colors" title={t('unban')}>
+                    <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                  </button>
+                ) : (
+                  <button onClick={() => banUser(user.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors" title={t('ban')}>
+                    <Ban className="w-3.5 h-3.5 text-destructive" />
+                  </button>
+                )}
+                <button onClick={() => handleDelete(user.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors" title={t('deleteUser')}>
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
                 </button>
-              )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 };
 
+/* ===== Vouchers ===== */
 const VouchersTab: React.FC = () => {
   const { t } = useTranslation();
   const { vouchers, generateVouchers } = useAdminStore();
@@ -300,7 +411,7 @@ const VouchersTab: React.FC = () => {
         )}
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+      <div className="admin-glass-card border border-border rounded-xl p-4 space-y-3">
         <h3 className="text-sm font-semibold text-foreground">{t('generateVouchers')}</h3>
         <input value={batch} onChange={e => setBatch(e.target.value)} placeholder={t('batchName')}
           className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
@@ -326,7 +437,7 @@ const VouchersTab: React.FC = () => {
 
       <div className="space-y-2">
         {vouchers.slice().reverse().slice(0, 50).map(v => (
-          <div key={v.id} className={`bg-card border border-border rounded-xl p-3 flex items-center gap-3 ${v.used ? 'opacity-50' : ''}`}>
+          <div key={v.id} className={`admin-glass-card border border-border rounded-xl p-3 flex items-center gap-3 ${v.used ? 'opacity-50' : ''}`}>
             <Ticket className="w-4 h-4 text-primary flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-mono font-bold text-foreground">{v.code}</p>
@@ -343,6 +454,7 @@ const VouchersTab: React.FC = () => {
   );
 };
 
+/* ===== Models ===== */
 const ModelsTab: React.FC = () => {
   const { t } = useTranslation();
   const { modelConfigs, setModelConfig } = useAdminStore();
@@ -356,14 +468,13 @@ const ModelsTab: React.FC = () => {
       <h1 className="text-lg font-bold text-foreground">{t('adminModels')}</h1>
       <div className="space-y-2">
         {modelConfigs.map(mc => (
-          <div key={mc.toolId} className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <div key={mc.toolId} className="admin-glass-card border border-border rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-foreground">{toolLabels[mc.toolId] || mc.toolId}</span>
               </div>
-              <button onClick={() => setModelConfig(mc.toolId, { enabled: !mc.enabled })}
-                className="p-1">
+              <button onClick={() => setModelConfig(mc.toolId, { enabled: !mc.enabled })} className="p-1">
                 {mc.enabled ? <ToggleRight className="w-6 h-6 text-primary" /> : <ToggleLeft className="w-6 h-6 text-muted-foreground" />}
               </button>
             </div>
@@ -375,6 +486,62 @@ const ModelsTab: React.FC = () => {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+};
+
+/* ===== Notices ===== */
+const NoticesTab: React.FC = () => {
+  const { t } = useTranslation();
+  const { notices, addNotice, updateNotice, deleteNotice } = useAdminStore();
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+
+  const handleAdd = () => {
+    if (!title.trim()) { toast.error(t('titleRequired')); return; }
+    addNotice(title.trim(), content.trim());
+    setTitle(''); setContent('');
+    toast.success(t('noticeAdded'));
+  };
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-lg font-bold text-foreground">{t('adminNotices')}</h1>
+
+      <div className="admin-glass-card border border-border rounded-xl p-4 space-y-3">
+        <h3 className="text-sm font-semibold text-foreground">{t('addNotice')}</h3>
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder={t('noticeTitle')}
+          className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
+        <textarea value={content} onChange={e => setContent(e.target.value)} placeholder={t('noticeContent')} rows={3}
+          className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+        <button onClick={handleAdd} className="w-full py-2 rounded-lg gradient-bg text-primary-foreground text-sm font-medium">
+          {t('publishNotice')}
+        </button>
+      </div>
+
+      <div className="space-y-2">
+        {notices.map(n => (
+          <div key={n.id} className="admin-glass-card border border-border rounded-xl p-3 space-y-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Megaphone className="w-3.5 h-3.5 text-primary" />
+                <span className="text-sm font-medium text-foreground">{n.title}</span>
+              </div>
+              <div className="flex gap-1">
+                <button onClick={() => updateNotice(n.id, { enabled: !n.enabled })} className="p-1 rounded hover:bg-secondary transition-colors">
+                  {n.enabled ? <Eye className="w-3.5 h-3.5 text-green-500" /> : <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />}
+                </button>
+                <button onClick={() => deleteNotice(n.id)} className="p-1 rounded hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">{n.content}</p>
+            <p className="text-[10px] text-muted-foreground/60">{new Date(n.createdAt).toLocaleString()}</p>
+          </div>
+        ))}
+        {notices.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">{t('noNotices')}</p>}
       </div>
     </div>
   );
