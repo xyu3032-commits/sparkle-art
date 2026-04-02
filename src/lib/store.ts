@@ -25,6 +25,7 @@ interface AppState {
   deviceMode: 'desktop' | 'mobile' | null;
   theme: 'light' | 'dark';
   themePreset: ThemePreset;
+  glassEffect: boolean;
   language: string;
   backgroundUrl: string;
   currentTool: string;
@@ -38,6 +39,7 @@ interface AppState {
   resetDeviceMode: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
   setThemePreset: (preset: ThemePreset) => void;
+  setGlassEffect: (enabled: boolean) => void;
   setLanguage: (lang: string) => void;
   setBackgroundUrl: (url: string) => void;
   setCurrentTool: (tool: string) => void;
@@ -76,10 +78,17 @@ const defaultApis: ApiConfig[] = [
   },
 ];
 
+// Init glass mode from localStorage
+const savedGlass = localStorage.getItem('ai-glass-effect') === 'true';
+if (savedGlass) {
+  document.documentElement.classList.add('glass-mode');
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   deviceMode: localStorage.getItem('ai-device-mode') as 'desktop' | 'mobile' | null,
   theme: (localStorage.getItem('ai-theme') as 'light' | 'dark') || 'light',
   themePreset: (localStorage.getItem('ai-theme-preset') as ThemePreset) || 'alpine',
+  glassEffect: savedGlass,
   language: localStorage.getItem('ai-platform-lang') || 'zh',
   backgroundUrl: localStorage.getItem('ai-bg-url') || '',
   currentTool: 'textGen',
@@ -99,17 +108,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   setTheme: (theme) => {
     localStorage.setItem('ai-theme', theme);
-    // Map light/dark to corresponding preset
     const currentPreset = get().themePreset;
     document.documentElement.classList.remove('theme-alpine', 'theme-midnight', 'theme-nebula', 'theme-parchment', 'dark');
     if (theme === 'dark') {
-      // If currently on a light preset, switch to midnight
       const darkPreset = (currentPreset === 'alpine' || currentPreset === 'parchment') ? 'midnight' : currentPreset;
       document.documentElement.classList.add(`theme-${darkPreset}`);
       localStorage.setItem('ai-theme-preset', darkPreset);
       set({ theme, themePreset: darkPreset });
     } else {
-      // If currently on a dark preset, switch to alpine
       const lightPreset = (currentPreset === 'midnight' || currentPreset === 'nebula') ? 'alpine' : currentPreset;
       document.documentElement.classList.add(`theme-${lightPreset}`);
       localStorage.setItem('ai-theme-preset', lightPreset);
@@ -118,14 +124,20 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   setThemePreset: (preset) => {
     localStorage.setItem('ai-theme-preset', preset);
-    // Remove all theme classes
     document.documentElement.classList.remove('theme-alpine', 'theme-midnight', 'theme-nebula', 'theme-parchment', 'dark');
-    // Apply the new theme class
     document.documentElement.classList.add(`theme-${preset}`);
-    // Set dark/light mode based on preset
     const isDark = preset === 'midnight' || preset === 'nebula';
     localStorage.setItem('ai-theme', isDark ? 'dark' : 'light');
     set({ themePreset: preset, theme: isDark ? 'dark' : 'light' });
+  },
+  setGlassEffect: (enabled) => {
+    localStorage.setItem('ai-glass-effect', String(enabled));
+    if (enabled) {
+      document.documentElement.classList.add('glass-mode');
+    } else {
+      document.documentElement.classList.remove('glass-mode');
+    }
+    set({ glassEffect: enabled });
   },
   setLanguage: (lang) => {
     localStorage.setItem('ai-platform-lang', lang);
@@ -156,7 +168,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   removeCustomApi: (id) => set((state) => {
     const apis = state.customApis.filter((a) => a.id !== id);
     localStorage.setItem('ai-custom-apis', JSON.stringify(apis));
-    // Also clean activeApis
     const active = { ...state.activeApis };
     for (const key of Object.keys(active)) {
       if (active[key] === id) delete active[key];
