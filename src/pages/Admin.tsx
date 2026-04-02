@@ -4,7 +4,8 @@ import {
   Shield, Lock, Users, BarChart3, Ticket, Cpu, LogOut, ArrowLeft,
   Plus, Ban, CheckCircle, Download, Search, ToggleLeft, ToggleRight,
   TrendingUp, UserPlus, Trash2, Edit3, Megaphone, GlassWater, Save, X,
-  Crown, Star, Gem, Eye, EyeOff
+  Crown, Star, Gem, Eye, EyeOff, Settings, Database, Activity, Clock,
+  AlertTriangle, RefreshCw, FileText, Zap, HardDrive
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +13,7 @@ import { useAdminStore, type ManagedUser } from '@/lib/adminStore';
 import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 
-type Tab = 'dashboard' | 'users' | 'vouchers' | 'models' | 'notices';
+type Tab = 'dashboard' | 'users' | 'vouchers' | 'models' | 'notices' | 'settings';
 
 const Admin: React.FC = () => {
   const { t } = useTranslation();
@@ -26,7 +27,6 @@ const Admin: React.FC = () => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
-  // Init glass mode
   React.useEffect(() => {
     if (admin.glassEffect) document.documentElement.classList.add('glass-mode');
   }, []);
@@ -67,6 +67,7 @@ const Admin: React.FC = () => {
     { id: 'vouchers', icon: Ticket, label: t('adminVouchers') },
     { id: 'models', icon: Cpu, label: t('adminModels') },
     { id: 'notices', icon: Megaphone, label: t('adminNotices') },
+    { id: 'settings', icon: Settings, label: t('adminSettings') },
   ];
 
   return (
@@ -80,16 +81,19 @@ const Admin: React.FC = () => {
         </div>
         <nav className="flex-1 p-2 space-y-1">
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+            <motion.button
+              key={tab.id}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
                 ${activeTab === tab.id ? 'gradient-bg text-primary-foreground shadow-glow' : 'text-muted-foreground hover:bg-secondary'}`}>
               <tab.icon className="w-4 h-4" />
               {tab.label}
-            </button>
+            </motion.button>
           ))}
         </nav>
         <div className="p-2 border-t border-border space-y-1">
-          {/* Glass toggle */}
           <button onClick={() => admin.setGlassEffect(!admin.glassEffect)}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-secondary transition-colors">
             <GlassWater className="w-4 h-4" />
@@ -107,7 +111,7 @@ const Admin: React.FC = () => {
 
       {/* Mobile tabs */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 admin-glass-card border-t border-border z-40 flex">
-        {tabs.map(tab => (
+        {tabs.slice(0, 5).map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] transition-colors ${activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'}`}>
             <tab.icon className="w-4 h-4" />
@@ -124,6 +128,7 @@ const Admin: React.FC = () => {
             {activeTab === 'vouchers' && <VouchersTab />}
             {activeTab === 'models' && <ModelsTab />}
             {activeTab === 'notices' && <NoticesTab />}
+            {activeTab === 'settings' && <AdminSettingsTab />}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -134,11 +139,14 @@ const Admin: React.FC = () => {
 /* ===== Dashboard ===== */
 const DashboardTab: React.FC<{ stats: { totalUsers: number; totalGenerations: number; todayActive: number } }> = ({ stats }) => {
   const { t } = useTranslation();
+  const { vouchers } = useAdminStore();
   const allStats = JSON.parse(localStorage.getItem('ai-usage-stats') || '{}');
+  const unusedVouchers = vouchers.filter(v => !v.used).length;
   const statCards = [
     { label: t('totalUsersLabel'), value: stats.totalUsers, icon: Users, color: 'text-primary' },
     { label: t('totalGenerations'), value: stats.totalGenerations, icon: TrendingUp, color: 'text-accent' },
-    { label: t('todayActive'), value: stats.todayActive, icon: BarChart3, color: 'text-green-500' },
+    { label: t('todayActive'), value: stats.todayActive, icon: Activity, color: 'text-green-500' },
+    { label: t('unusedVouchers'), value: unusedVouchers, icon: Ticket, color: 'text-amber-500' },
   ];
   const toolStats = [
     { id: 'textGen', label: t('textGen'), count: allStats.textGen || 0 },
@@ -151,18 +159,43 @@ const DashboardTab: React.FC<{ stats: { totalUsers: number; totalGenerations: nu
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-bold text-foreground">{t('adminDashboard')}</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-bold text-foreground">{t('adminDashboard')}</h1>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Clock className="w-3.5 h-3.5" />
+          {new Date().toLocaleDateString()}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {statCards.map((s, i) => (
-          <div key={i} className="admin-glass-card border border-border rounded-2xl p-4">
+          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+            className="admin-glass-card border border-border rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <s.icon className={`w-4 h-4 ${s.color}`} />
               <span className="text-xs text-muted-foreground">{s.label}</span>
             </div>
             <p className="text-2xl font-bold text-foreground">{s.value}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {[
+          { label: t('clearAllData'), icon: Trash2, action: () => { localStorage.removeItem('ai-usage-stats'); toast.success(t('dataCleared')); }, color: 'text-destructive' },
+          { label: t('exportAllData'), icon: Download, action: () => { exportAllData(); toast.success(t('exportSuccess')); }, color: 'text-primary' },
+          { label: t('refreshStats'), icon: RefreshCw, action: () => { window.location.reload(); }, color: 'text-green-500' },
+          { label: t('systemInfo'), icon: HardDrive, action: () => { toast.info(`localStorage: ${(JSON.stringify(localStorage).length / 1024).toFixed(1)}KB`); }, color: 'text-amber-500' },
+        ].map((a, i) => (
+          <motion.button key={i} whileTap={{ scale: 0.95 }}
+            onClick={a.action}
+            className="admin-glass-card border border-border rounded-xl p-3 flex items-center gap-2 hover:border-primary/30 transition-all">
+            <a.icon className={`w-4 h-4 ${a.color}`} />
+            <span className="text-xs font-medium text-foreground">{a.label}</span>
+          </motion.button>
+        ))}
+      </div>
+
       <div className="admin-glass-card border border-border rounded-2xl p-4">
         <h3 className="text-sm font-semibold text-foreground mb-4">{t('usageBreakdown')}</h3>
         <div className="space-y-3">
@@ -185,6 +218,21 @@ const DashboardTab: React.FC<{ stats: { totalUsers: number; totalGenerations: nu
   );
 };
 
+function exportAllData() {
+  const data = {
+    users: JSON.parse(localStorage.getItem('admin-users') || '[]'),
+    vouchers: JSON.parse(localStorage.getItem('admin-vouchers') || '[]'),
+    stats: JSON.parse(localStorage.getItem('ai-usage-stats') || '{}'),
+    notices: JSON.parse(localStorage.getItem('admin-notices') || '[]'),
+    modelConfigs: JSON.parse(localStorage.getItem('admin-model-configs') || '[]'),
+    exportedAt: new Date().toISOString(),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `admin-export-${Date.now()}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+
 /* ===== Users ===== */
 const UsersTab: React.FC = () => {
   const { t } = useTranslation();
@@ -195,8 +243,13 @@ const UsersTab: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newLevel, setNewLevel] = useState<ManagedUser['level']>('free');
+  const [filterLevel, setFilterLevel] = useState<string>('all');
 
-  const filtered = users.filter(u => u.email.includes(search) || u.username.includes(search));
+  const filtered = users.filter(u => {
+    const matchSearch = u.email.includes(search) || u.username.includes(search);
+    const matchLevel = filterLevel === 'all' || u.level === filterLevel;
+    return matchSearch && matchLevel;
+  });
 
   const handleAdd = () => {
     if (!newEmail) return;
@@ -224,15 +277,23 @@ const UsersTab: React.FC = () => {
     toast.success(t('userUpdated'));
   };
 
+  const handleBulkBan = () => {
+    const bannedCount = filtered.filter(u => !u.banned).length;
+    filtered.forEach(u => { if (!u.banned) banUser(u.id); });
+    toast.success(`${t('ban')} ${bannedCount} ${t('adminUsers')}`);
+  };
+
   const levelIcons: Record<string, React.ElementType> = { free: Star, pro: Crown, lifetime: Gem };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="text-lg font-bold text-foreground">{t('adminUsers')}</h1>
-        <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowAdd(!showAdd)} className="px-3 py-1.5 rounded-lg gradient-bg text-primary-foreground text-xs font-medium flex items-center gap-1">
-          <UserPlus className="w-3.5 h-3.5" /> {t('addUser')}
-        </motion.button>
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <h1 className="text-lg font-bold text-foreground">{t('adminUsers')} ({users.length})</h1>
+        <div className="flex gap-2">
+          <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowAdd(!showAdd)} className="px-3 py-1.5 rounded-lg gradient-bg text-primary-foreground text-xs font-medium flex items-center gap-1">
+            <UserPlus className="w-3.5 h-3.5" /> {t('addUser')}
+          </motion.button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -314,10 +375,21 @@ const UsersTab: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchUsers')}
-          className="w-full pl-10 pr-4 py-2 rounded-xl bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
+      {/* Search + Filter */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchUsers')}
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
+        </div>
+        <select value={filterLevel} onChange={e => setFilterLevel(e.target.value)}
+          className="px-3 py-2 rounded-xl bg-secondary text-sm border border-border focus:outline-none">
+          <option value="all">{t('allLevels')}</option>
+          <option value="guest">{t('levelGuest')}</option>
+          <option value="free">{t('levelFree')}</option>
+          <option value="pro">{t('levelPro')}</option>
+          <option value="lifetime">{t('levelLifetime')}</option>
+        </select>
       </div>
 
       <div className="space-y-2">
@@ -325,7 +397,9 @@ const UsersTab: React.FC = () => {
         {filtered.map(user => {
           const LevelIcon = levelIcons[user.level] || Star;
           return (
-            <div key={user.id} className={`admin-glass-card border border-border rounded-xl p-3 flex items-center gap-3 ${user.banned ? 'opacity-50' : ''}`}>
+            <motion.div key={user.id}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className={`admin-glass-card border border-border rounded-xl p-3 flex items-center gap-3 ${user.banned ? 'opacity-50' : ''}`}>
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
                 user.memberStyle === 'gold' ? 'bg-amber-500/20' :
                 user.memberStyle === 'diamond' ? 'bg-cyan-500/20' :
@@ -349,16 +423,19 @@ const UsersTab: React.FC = () => {
               }`}>
                 {t(`level${user.level.charAt(0).toUpperCase() + user.level.slice(1)}`)}
               </span>
+              {user.banned && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-destructive/10 text-destructive">{t('banned')}</span>
+              )}
               <div className="flex gap-0.5">
                 <button onClick={() => setEditingUser({ ...user })} className="p-1.5 rounded-lg hover:bg-secondary transition-colors" title={t('editUser')}>
                   <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
                 {user.banned ? (
-                  <button onClick={() => unbanUser(user.id)} className="p-1.5 rounded-lg hover:bg-green-500/10 transition-colors" title={t('unban')}>
+                  <button onClick={() => { unbanUser(user.id); toast.success(t('unban')); }} className="p-1.5 rounded-lg hover:bg-green-500/10 transition-colors" title={t('unban')}>
                     <CheckCircle className="w-3.5 h-3.5 text-green-500" />
                   </button>
                 ) : (
-                  <button onClick={() => banUser(user.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors" title={t('ban')}>
+                  <button onClick={() => { banUser(user.id); toast.success(t('ban')); }} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors" title={t('ban')}>
                     <Ban className="w-3.5 h-3.5 text-destructive" />
                   </button>
                 )}
@@ -366,7 +443,7 @@ const UsersTab: React.FC = () => {
                   <Trash2 className="w-3.5 h-3.5 text-destructive" />
                 </button>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -383,6 +460,7 @@ const VouchersTab: React.FC = () => {
   const [value, setValue] = useState(100);
   const [count, setCount] = useState(10);
   const [expDays, setExpDays] = useState(30);
+  const [filterUsed, setFilterUsed] = useState<string>('all');
 
   const handleGenerate = () => {
     if (!batch) { toast.error(t('batchRequired')); return; }
@@ -400,15 +478,29 @@ const VouchersTab: React.FC = () => {
     toast.success(t('exportSuccess'));
   };
 
+  const filteredVouchers = vouchers.filter(v => {
+    if (filterUsed === 'used') return v.used;
+    if (filterUsed === 'unused') return !v.used;
+    return true;
+  });
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="text-lg font-bold text-foreground">{t('adminVouchers')}</h1>
-        {vouchers.length > 0 && (
-          <button onClick={handleExportCSV} className="px-3 py-1.5 rounded-lg bg-secondary text-xs font-medium text-muted-foreground flex items-center gap-1 hover:bg-muted transition-colors">
-            <Download className="w-3.5 h-3.5" /> CSV
-          </button>
-        )}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <h1 className="text-lg font-bold text-foreground">{t('adminVouchers')} ({vouchers.length})</h1>
+        <div className="flex gap-2">
+          <select value={filterUsed} onChange={e => setFilterUsed(e.target.value)}
+            className="px-3 py-1.5 rounded-lg bg-secondary text-xs border border-border">
+            <option value="all">{t('allVouchers')}</option>
+            <option value="used">{t('used')}</option>
+            <option value="unused">{t('unused')}</option>
+          </select>
+          {vouchers.length > 0 && (
+            <button onClick={handleExportCSV} className="px-3 py-1.5 rounded-lg bg-secondary text-xs font-medium text-muted-foreground flex items-center gap-1 hover:bg-muted transition-colors">
+              <Download className="w-3.5 h-3.5" /> CSV
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="admin-glass-card border border-border rounded-xl p-4 space-y-3">
@@ -436,7 +528,7 @@ const VouchersTab: React.FC = () => {
       </div>
 
       <div className="space-y-2">
-        {vouchers.slice().reverse().slice(0, 50).map(v => (
+        {filteredVouchers.slice().reverse().slice(0, 50).map(v => (
           <div key={v.id} className={`admin-glass-card border border-border rounded-xl p-3 flex items-center gap-3 ${v.used ? 'opacity-50' : ''}`}>
             <Ticket className="w-4 h-4 text-primary flex-shrink-0" />
             <div className="flex-1 min-w-0">
@@ -448,7 +540,7 @@ const VouchersTab: React.FC = () => {
             </span>
           </div>
         ))}
-        {vouchers.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">{t('noVouchers')}</p>}
+        {filteredVouchers.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">{t('noVouchers')}</p>}
       </div>
     </div>
   );
@@ -507,7 +599,7 @@ const NoticesTab: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-bold text-foreground">{t('adminNotices')}</h1>
+      <h1 className="text-lg font-bold text-foreground">{t('adminNotices')} ({notices.length})</h1>
 
       <div className="admin-glass-card border border-border rounded-xl p-4 space-y-3">
         <h3 className="text-sm font-semibold text-foreground">{t('addNotice')}</h3>
@@ -542,6 +634,128 @@ const NoticesTab: React.FC = () => {
           </div>
         ))}
         {notices.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">{t('noNotices')}</p>}
+      </div>
+    </div>
+  );
+};
+
+/* ===== Admin Settings ===== */
+const AdminSettingsTab: React.FC = () => {
+  const { t } = useTranslation();
+  const admin = useAdminStore();
+  const [newPassword, setNewPassword] = useState('');
+  const [siteName, setSiteName] = useState(localStorage.getItem('admin-site-name') || '');
+  const [siteDesc, setSiteDesc] = useState(localStorage.getItem('admin-site-desc') || '');
+  const [defaultQuota, setDefaultQuota] = useState(parseInt(localStorage.getItem('admin-default-quota') || '100'));
+  const [maxDaily, setMaxDaily] = useState(parseInt(localStorage.getItem('admin-max-daily') || '1000'));
+  const [registrationOpen, setRegistrationOpen] = useState(localStorage.getItem('admin-registration') !== 'false');
+
+  const handleSaveSiteSettings = () => {
+    localStorage.setItem('admin-site-name', siteName);
+    localStorage.setItem('admin-site-desc', siteDesc);
+    localStorage.setItem('admin-default-quota', String(defaultQuota));
+    localStorage.setItem('admin-max-daily', String(maxDaily));
+    localStorage.setItem('admin-registration', String(registrationOpen));
+    toast.success(t('settingsSaved'));
+  };
+
+  const storageUsed = (JSON.stringify(localStorage).length / 1024).toFixed(1);
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-lg font-bold text-foreground">{t('adminSettings')}</h1>
+
+      {/* Site Config */}
+      <div className="admin-glass-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <FileText className="w-4 h-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">{t('siteConfig')}</h3>
+        </div>
+        <input value={siteName} onChange={e => setSiteName(e.target.value)} placeholder={t('siteName')}
+          className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30" />
+        <textarea value={siteDesc} onChange={e => setSiteDesc(e.target.value)} placeholder={t('siteDesc')} rows={2}
+          className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">{t('defaultQuota')}</label>
+            <input type="number" value={defaultQuota} onChange={e => setDefaultQuota(+e.target.value)}
+              className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none" />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">{t('maxDailyUsage')}</label>
+            <input type="number" value={maxDaily} onChange={e => setMaxDaily(+e.target.value)}
+              className="w-full px-3 py-2 rounded-lg bg-secondary text-sm border border-border focus:outline-none" />
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-foreground">{t('openRegistration')}</span>
+          <button onClick={() => setRegistrationOpen(!registrationOpen)}>
+            {registrationOpen ? <ToggleRight className="w-6 h-6 text-primary" /> : <ToggleLeft className="w-6 h-6 text-muted-foreground" />}
+          </button>
+        </div>
+        <button onClick={handleSaveSiteSettings} className="w-full py-2 rounded-lg gradient-bg text-primary-foreground text-sm font-medium flex items-center justify-center gap-1">
+          <Save className="w-3.5 h-3.5" /> {t('save')}
+        </button>
+      </div>
+
+      {/* System Info */}
+      <div className="admin-glass-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <HardDrive className="w-4 h-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">{t('systemInfo')}</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground">{t('storageUsed')}</p>
+            <p className="text-sm font-bold text-foreground">{storageUsed} KB</p>
+          </div>
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground">{t('totalUsersLabel')}</p>
+            <p className="text-sm font-bold text-foreground">{admin.users.length}</p>
+          </div>
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground">{t('totalVouchers')}</p>
+            <p className="text-sm font-bold text-foreground">{admin.vouchers.length}</p>
+          </div>
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground">{t('totalNotices')}</p>
+            <p className="text-sm font-bold text-foreground">{admin.notices.length}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="admin-glass-card border border-destructive/20 rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-destructive" />
+          <h3 className="text-sm font-semibold text-destructive">{t('dangerZone')}</h3>
+        </div>
+        <div className="space-y-2">
+          <button onClick={() => {
+            if (confirm(t('confirmClearUsers'))) {
+              localStorage.setItem('admin-users', '[]');
+              window.location.reload();
+            }
+          }} className="w-full py-2 rounded-lg bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-colors">
+            {t('clearAllUsers')}
+          </button>
+          <button onClick={() => {
+            if (confirm(t('confirmClearVouchers'))) {
+              localStorage.setItem('admin-vouchers', '[]');
+              window.location.reload();
+            }
+          }} className="w-full py-2 rounded-lg bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-colors">
+            {t('clearAllVouchers')}
+          </button>
+          <button onClick={() => {
+            if (confirm(t('confirmResetAll'))) {
+              localStorage.clear();
+              window.location.reload();
+            }
+          }} className="w-full py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors">
+            {t('resetAllData')}
+          </button>
+        </div>
       </div>
     </div>
   );

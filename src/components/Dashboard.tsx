@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu } from 'lucide-react';
+import { Menu, Sparkles } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import Sidebar from '@/components/Sidebar';
 import MobileNav from '@/components/MobileNav';
@@ -26,7 +26,7 @@ const toolComponents: Record<string, React.FC> = {
 };
 
 const Dashboard: React.FC = () => {
-  const { deviceMode, currentTool, backgroundUrl } = useAppStore();
+  const { deviceMode, currentTool, backgroundUrl, glassEffect } = useAppStore();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showBotCheck, setShowBotCheck] = useState(needsBotCheck);
   const isMobile = deviceMode === 'mobile';
@@ -48,25 +48,31 @@ const Dashboard: React.FC = () => {
       {isMobile && <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />}
 
       <div className="flex-1 flex flex-col relative z-10 min-w-0">
-        <div className="px-3 sm:px-4 py-2 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md relative z-30">
+        <div className={`px-3 sm:px-4 py-2 border-b border-border flex items-center justify-between relative z-30
+          ${glassEffect ? 'bg-card/50 backdrop-blur-xl' : 'bg-card/80 backdrop-blur-md'}`}>
           <div className="flex items-center gap-2">
             {isMobile && (
-              <button onClick={() => setMobileNavOpen(true)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setMobileNavOpen(true)}
+                className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+              >
                 <Menu className="w-5 h-5 text-foreground" />
-              </button>
+              </motion.button>
             )}
           </div>
           <TopBar />
         </div>
 
-        <div className="flex-1 overflow-hidden bg-card/60 backdrop-blur-sm relative z-0">
+        <div className={`flex-1 overflow-hidden relative z-0
+          ${glassEffect ? 'bg-card/30 backdrop-blur-sm' : 'bg-card/60 backdrop-blur-sm'}`}>
           <AnimatePresence mode="wait">
             <motion.div
               key={currentTool}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="h-full"
             >
               <ToolComponent />
