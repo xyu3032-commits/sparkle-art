@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, User, BookOpen, Info, ChevronDown, Key, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 import { useChatStore } from '@/lib/chatStore';
