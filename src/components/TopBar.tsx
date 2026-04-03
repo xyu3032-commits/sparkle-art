@@ -28,9 +28,10 @@ const TopBar: React.FC = () => {
         <ThemeSwitcher />
         {/* New Chat */}
         <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={handleNewChat}
-          className="p-2 rounded-xl hover:bg-secondary transition-colors"
+          whileTap={{ scale: 0.85, rotate: 90 }}
+          whileHover={{ scale: 1.1, backgroundColor: 'hsl(var(--secondary))' }}
+          onClick={() => { handleNewChat(); toast.success(t('newChat')); }}
+          className="p-2 rounded-xl glass-btn-icon transition-all duration-200"
           title={t('newChat')}
         >
           <Plus className="w-4 h-4 text-muted-foreground" />
