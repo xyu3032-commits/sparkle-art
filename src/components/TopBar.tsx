@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, User, BookOpen, Info, ChevronDown, Key, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/lib/store';
 import { useChatStore } from '@/lib/chatStore';
@@ -28,9 +29,10 @@ const TopBar: React.FC = () => {
         <ThemeSwitcher />
         {/* New Chat */}
         <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={handleNewChat}
-          className="p-2 rounded-xl hover:bg-secondary transition-colors"
+          whileTap={{ scale: 0.85, rotate: 90 }}
+          whileHover={{ scale: 1.1, backgroundColor: 'hsl(var(--secondary))' }}
+          onClick={() => { handleNewChat(); toast.success(t('newChat')); }}
+          className="p-2 rounded-xl glass-btn-icon transition-all duration-200"
           title={t('newChat')}
         >
           <Plus className="w-4 h-4 text-muted-foreground" />
@@ -38,9 +40,10 @@ const TopBar: React.FC = () => {
 
         {/* API Manager */}
         <motion.button
-          whileTap={{ scale: 0.92 }}
+          whileTap={{ scale: 0.85 }}
+          whileHover={{ scale: 1.1 }}
           onClick={() => setApiManagerOpen(true)}
-          className="p-2 rounded-xl hover:bg-secondary transition-colors"
+          className="p-2 rounded-xl glass-btn-icon transition-all duration-200"
           title={t('apiManager')}
         >
           <Key className="w-4 h-4 text-muted-foreground" />
@@ -48,9 +51,10 @@ const TopBar: React.FC = () => {
 
         {/* Tutorial */}
         <motion.button
-          whileTap={{ scale: 0.92 }}
+          whileTap={{ scale: 0.85 }}
+          whileHover={{ scale: 1.1 }}
           onClick={() => setTutorialOpen(true)}
-          className="p-2 rounded-xl hover:bg-secondary transition-colors hidden sm:flex"
+          className="p-2 rounded-xl glass-btn-icon transition-all duration-200 hidden sm:flex"
           title={t('tutorial')}
         >
           <BookOpen className="w-4 h-4 text-muted-foreground" />

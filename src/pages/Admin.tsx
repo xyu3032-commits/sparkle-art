@@ -110,13 +110,14 @@ const Admin: React.FC = () => {
       </aside>
 
       {/* Mobile tabs */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 admin-glass-card border-t border-border z-40 flex">
-        {tabs.slice(0, 5).map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] transition-colors ${activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'}`}>
+      <div className="md:hidden fixed bottom-0 left-0 right-0 admin-glass-card border-t border-border z-40 flex overflow-x-auto">
+        {tabs.map(tab => (
+          <motion.button key={tab.id} whileTap={{ scale: 0.9 }} onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 min-w-0 flex flex-col items-center gap-0.5 py-2.5 text-[10px] transition-all ${activeTab === tab.id ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
             <tab.icon className="w-4 h-4" />
-            {tab.label}
-          </button>
+            <span className="truncate w-full text-center px-0.5">{tab.label}</span>
+            {activeTab === tab.id && <motion.div layoutId="mobile-tab-indicator" className="w-4 h-0.5 rounded-full gradient-bg mt-0.5" />}
+          </motion.button>
         ))}
       </div>
 
