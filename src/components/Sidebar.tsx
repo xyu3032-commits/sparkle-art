@@ -47,13 +47,15 @@ const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
           return (
             <motion.button
               key={item.id}
-              whileTap={{ scale: 0.96 }}
-              whileHover={{ scale: 1.02, transition: { type: 'spring', stiffness: 400, damping: 20 } }}
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.03, transition: { type: 'spring', stiffness: 400, damping: 17 } }}
               onClick={() => setCurrentTool(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200
-                ${active ? 'gradient-bg text-primary-foreground shadow-glow' : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'}`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 glass-nav-item
+                ${active ? 'gradient-bg text-primary-foreground shadow-glow active' : 'text-muted-foreground hover:text-secondary-foreground'}`}
             >
-              <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+              <motion.div animate={active ? { rotate: [0, -8, 8, 0] } : {}} transition={{ duration: 0.4 }}>
+                <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+              </motion.div>
               {!collapsed && <span className="truncate">{t(item.labelKey)}</span>}
             </motion.button>
           );
