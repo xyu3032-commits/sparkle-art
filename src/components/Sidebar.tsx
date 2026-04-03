@@ -64,25 +64,28 @@ const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
 
       <div className="p-2 space-y-1 border-t border-border">
         <motion.button
-          whileTap={{ scale: 0.96 }}
+          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.03 }}
           onClick={() => setUserCenterOpen(true)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-secondary-foreground transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground glass-btn-action transition-all"
         >
           <User className="w-[18px] h-[18px]" />
           {!collapsed && <span>{t('userCenter')}</span>}
         </motion.button>
         <motion.button
-          whileTap={{ scale: 0.96 }}
+          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.03 }}
           onClick={() => setSettingsOpen(true)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-secondary-foreground transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground glass-btn-action transition-all"
         >
           <Settings className="w-[18px] h-[18px]" />
           {!collapsed && <span>{t('settings')}</span>}
         </motion.button>
         <motion.a
-          whileTap={{ scale: 0.96 }}
+          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.03 }}
           href="#"
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-secondary-foreground transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground glass-btn-action transition-all"
         >
           <Download className="w-[18px] h-[18px]" />
           {!collapsed && <span>{t('download')}</span>}
