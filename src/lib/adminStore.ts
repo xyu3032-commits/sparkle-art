@@ -97,7 +97,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   glassEffect: savedGlass,
 
   adminLogin: (password) => {
-    if (password === ADMIN_PASSWORD) {
+    const customPwd = localStorage.getItem('admin-password');
+    const validPwd = customPwd || ADMIN_PASSWORD;
+    if (password === validPwd) {
       localStorage.setItem('admin-logged-in', 'true');
       set({ isAdminLoggedIn: true });
       return true;
