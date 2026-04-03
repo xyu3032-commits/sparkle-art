@@ -22,7 +22,7 @@ const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className={`h-full flex flex-col bg-card border-r border-border ${collapsed ? 'w-16' : 'w-56'} transition-all duration-300`}
+      className={`h-full flex flex-col admin-glass-card border-r border-border ${collapsed ? 'w-16' : 'w-56'} transition-all duration-300`}
     >
       {/* Logo */}
       <div className="p-4 flex items-center gap-2.5 border-b border-border">
