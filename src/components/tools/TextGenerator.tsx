@@ -140,20 +140,28 @@ const TextGenerator: React.FC = () => {
       {/* Header */}
       <div className="px-3 sm:px-4 py-2.5 border-b border-border flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <motion.button whileTap={{ scale: 0.95 }} onClick={() => setHistoryOpen(true)}
-            className="p-1.5 rounded-lg hover:bg-secondary transition-colors" title={t('chatHistory')}>
-            <History className="w-4 h-4 text-muted-foreground" />
+          <motion.button whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.08 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            onClick={() => setHistoryOpen(true)}
+            className="p-1.5 pill-btn glass-btn-icon" title={t('chatHistory')}>
+            <History className="w-4 h-4 text-muted-foreground relative z-10" />
           </motion.button>
           <h2 className="font-semibold text-card-foreground text-sm truncate">{t('textGen')}</h2>
         </div>
         <div className="flex items-center gap-1">
-          <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowParams(!showParams)}
-            className={`p-1.5 rounded-lg transition-colors ${showParams ? 'bg-primary/10 text-primary' : 'hover:bg-secondary'}`} title={t('advancedParams')}>
-            <Settings2 className="w-4 h-4" />
+          <motion.button whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.08 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            onClick={() => setShowParams(!showParams)}
+            className={`p-1.5 pill-btn glass-btn-icon ${showParams ? 'bg-primary/10 text-primary' : ''}`} title={t('advancedParams')}>
+            <Settings2 className="w-4 h-4 relative z-10" />
           </motion.button>
-          <motion.button whileTap={{ scale: 0.95 }} onClick={handleNewChat}
-            className="p-1.5 rounded-lg hover:bg-secondary transition-colors" title={t('newChat')}>
-            <Plus className="w-4 h-4 text-muted-foreground" />
+          <motion.button
+            whileTap={{ scale: 0.8, rotate: 180 }}
+            whileHover={{ scale: 1.12 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+            onClick={() => { handleNewChat(); toast.success(t('newChat')); }}
+            className="p-1.5 pill-btn glass-btn-icon" title={t('newChat')}>
+            <Plus className="w-4 h-4 text-muted-foreground relative z-10" />
           </motion.button>
           {/* API Switcher */}
           <div className="relative">
