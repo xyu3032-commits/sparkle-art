@@ -24,53 +24,57 @@ const TopBar: React.FC = () => {
 
   return (
     <>
-      <div className="flex items-center gap-0.5">
-        {/* Theme Switcher */}
+      <div className="flex items-center gap-1">
         <ThemeSwitcher />
-        {/* New Chat */}
+
+        {/* New Chat — oval with bounce */}
         <motion.button
-          whileTap={{ scale: 0.85, rotate: 90 }}
-          whileHover={{ scale: 1.1, backgroundColor: 'hsl(var(--secondary))' }}
+          whileTap={{ scale: 0.8, rotate: 180 }}
+          whileHover={{ scale: 1.12 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
           onClick={() => { handleNewChat(); toast.success(t('newChat')); }}
-          className="p-2 rounded-xl glass-btn-icon transition-all duration-200"
+          className="p-2 pill-btn glass-btn-icon"
           title={t('newChat')}
         >
-          <Plus className="w-4 h-4 text-muted-foreground" />
+          <Plus className="w-4 h-4 text-muted-foreground relative z-10" />
         </motion.button>
 
         {/* API Manager */}
         <motion.button
           whileTap={{ scale: 0.85 }}
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.08 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
           onClick={() => setApiManagerOpen(true)}
-          className="p-2 rounded-xl glass-btn-icon transition-all duration-200"
+          className="p-2 pill-btn glass-btn-icon"
           title={t('apiManager')}
         >
-          <Key className="w-4 h-4 text-muted-foreground" />
+          <Key className="w-4 h-4 text-muted-foreground relative z-10" />
         </motion.button>
 
         {/* Tutorial */}
         <motion.button
           whileTap={{ scale: 0.85 }}
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.08 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
           onClick={() => setTutorialOpen(true)}
-          className="p-2 rounded-xl glass-btn-icon transition-all duration-200 hidden sm:flex"
+          className="p-2 pill-btn glass-btn-icon hidden sm:flex"
           title={t('tutorial')}
         >
-          <BookOpen className="w-4 h-4 text-muted-foreground" />
+          <BookOpen className="w-4 h-4 text-muted-foreground relative z-10" />
         </motion.button>
 
         {/* User dropdown */}
         <div className="relative">
           <motion.button
-            whileTap={{ scale: 0.92 }}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex items-center gap-1 px-1.5 py-1.5 rounded-xl hover:bg-secondary transition-colors"
+            className="flex items-center gap-1 px-2 py-1.5 pill-btn glass-btn-icon"
           >
-            <div className="w-6 h-6 rounded-lg gradient-bg flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full gradient-bg flex items-center justify-center relative z-10">
               <User className="w-3 h-3 text-primary-foreground" />
             </div>
-            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 relative z-10 ${menuOpen ? 'rotate-180' : ''}`} />
           </motion.button>
 
           <AnimatePresence>
@@ -88,40 +92,28 @@ const TopBar: React.FC = () => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1.5 w-44 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
+                  className="absolute right-0 top-full mt-1.5 w-44 bg-card border border-border rounded-2xl shadow-lg z-50 overflow-hidden admin-glass-card"
                 >
                   <div className="px-3 py-2 border-b border-border">
                     <p className="text-xs font-medium text-card-foreground truncate">{user?.username || t('guest')}</p>
                     <p className="text-[10px] text-muted-foreground truncate">{user?.email || ''}</p>
                   </div>
-                  <button
-                    onClick={() => { setMenuOpen(false); setProfileOpen(true); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors"
-                  >
-                    <User className="w-3.5 h-3.5 text-muted-foreground" />
-                    {t('profileSettings')}
-                  </button>
-                  <button
-                    onClick={() => { setMenuOpen(false); setUserCenterOpen(true); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors"
-                  >
-                    <Info className="w-3.5 h-3.5 text-muted-foreground" />
-                    {t('userCenter')}
-                  </button>
-                  <button
-                    onClick={() => { setMenuOpen(false); setApiManagerOpen(true); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors"
-                  >
-                    <Key className="w-3.5 h-3.5 text-muted-foreground" />
-                    {t('apiManager')}
-                  </button>
-                  <button
-                    onClick={() => { setMenuOpen(false); setTutorialOpen(true); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-secondary transition-colors border-t border-border"
-                  >
-                    <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
-                    {t('help')}
-                  </button>
+                  {[
+                    { icon: User, label: t('profileSettings'), action: () => { setMenuOpen(false); setProfileOpen(true); } },
+                    { icon: Info, label: t('userCenter'), action: () => { setMenuOpen(false); setUserCenterOpen(true); } },
+                    { icon: Key, label: t('apiManager'), action: () => { setMenuOpen(false); setApiManagerOpen(true); } },
+                    { icon: HelpCircle, label: t('help'), action: () => { setMenuOpen(false); setTutorialOpen(true); }, border: true },
+                  ].map((item, i) => (
+                    <motion.button
+                      key={i}
+                      whileTap={{ scale: 0.97, backgroundColor: 'hsl(var(--primary) / 0.1)' }}
+                      onClick={item.action}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 text-xs text-card-foreground hover:bg-secondary/80 transition-colors ${item.border ? 'border-t border-border' : ''}`}
+                    >
+                      <item.icon className="w-3.5 h-3.5 text-muted-foreground" />
+                      {item.label}
+                    </motion.button>
+                  ))}
                 </motion.div>
               </>
             )}
@@ -148,16 +140,20 @@ const TopBar: React.FC = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-x-4 top-[10%] sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-md bg-card border border-border rounded-2xl z-[60] max-h-[80vh] overflow-y-auto scrollbar-thin"
+              className="fixed inset-x-4 top-[10%] sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-md bg-card border border-border rounded-2xl z-[60] max-h-[80vh] overflow-y-auto scrollbar-thin admin-glass-card"
             >
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <h2 className="font-semibold text-card-foreground text-sm flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-primary" />
                   {t('tutorial')}
                 </h2>
-                <button onClick={() => setTutorialOpen(false)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-                  <motion.span whileTap={{ scale: 0.9 }}>✕</motion.span>
-                </button>
+                <motion.button
+                  whileTap={{ scale: 0.85, rotate: 90 }}
+                  onClick={() => setTutorialOpen(false)}
+                  className="p-1.5 pill-btn glass-btn-icon"
+                >
+                  <span className="relative z-10">✕</span>
+                </motion.button>
               </div>
               <div className="p-4 space-y-3">
                 {[
@@ -172,7 +168,8 @@ const TopBar: React.FC = () => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.06 }}
-                    className="flex gap-3 p-3 rounded-xl bg-secondary/50 border border-border"
+                    whileHover={{ scale: 1.01, x: 4 }}
+                    className="flex gap-3 p-3 rounded-2xl bg-secondary/50 border border-border"
                   >
                     <span className="text-lg">{item.icon}</span>
                     <div>
