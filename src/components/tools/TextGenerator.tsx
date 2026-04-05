@@ -28,7 +28,9 @@ const TextGenerator: React.FC = () => {
   const [temperature, setTemperature] = useState(() => parseFloat(localStorage.getItem('ai-param-temperature') || '0.7'));
   const [topP, setTopP] = useState(() => parseFloat(localStorage.getItem('ai-param-top-p') || '0.9'));
   const [maxTokens, setMaxTokens] = useState(() => parseInt(localStorage.getItem('ai-param-max-tokens') || '2048'));
+  const [isVoiceRecording, setIsVoiceRecording] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const voiceRef = useRef<any>(null);
 
   const allApis = [...defaultApis, ...customApis].filter(a => a.toolId === 'textGen');
   const api = getActiveApiForTool('textGen');
