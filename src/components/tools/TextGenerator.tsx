@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, Loader2, ChevronDown, Check, Cpu, Plus, History, Settings2 } from 'lucide-react';
+import { Send, Bot, User, Loader2, ChevronDown, Check, Cpu, Plus, History, Settings2, Mic, MicOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, defaultApis } from '@/lib/store';
 import { useChatStore } from '@/lib/chatStore';
