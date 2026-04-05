@@ -50,6 +50,30 @@ const TextGenerator: React.FC = () => {
 
   const saveParam = (key: string, val: string) => localStorage.setItem(key, val);
 
+  const toggleVoice = useCallback(() => {
+    if (isVoiceRecording) {
+      voiceRef.current?.stop();
+      setIsVoiceRecording(false);
+      return;
+    }
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { toast.error(t('voiceNotSupported')); return; }
+    const recognition = new SR();
+    recognition.lang = 'zh-CN';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.onresult = (e: any) => {
+      let text = '';
+      for (let i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
+      setInput(text);
+    };
+    recognition.onerror = () => setIsVoiceRecording(false);
+    recognition.onend = () => setIsVoiceRecording(false);
+    recognition.start();
+    voiceRef.current = recognition;
+    setIsVoiceRecording(true);
+  }, [isVoiceRecording, t]);
+
   const handleNewChat = () => {
     createSession('textGen');
     setMessages([]);
