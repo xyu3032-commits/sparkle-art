@@ -286,15 +286,24 @@ const TextGenerator: React.FC = () => {
 
       {/* Input */}
       <div className="p-3 border-t border-border">
-        <div className="flex gap-2">
-          <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()} placeholder={t('chatPlaceholder')}
-            className="flex-1 px-4 py-2.5 rounded-full bg-secondary text-sm text-secondary-foreground border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow" />
+        <div className="flex gap-2 items-center">
+          <motion.button
+            whileTap={{ scale: 0.8 }}
+            whileHover={{ scale: 1.1 }}
+            animate={isVoiceRecording ? { boxShadow: ['0 0 0 0 hsl(var(--destructive) / 0.4)', '0 0 0 12px hsl(var(--destructive) / 0)', '0 0 0 0 hsl(var(--destructive) / 0.4)'] } : {}}
+            transition={isVoiceRecording ? { duration: 1.2, repeat: Infinity } : { type: 'spring', stiffness: 400, damping: 17 }}
+            onClick={toggleVoice}
+            className={`p-2.5 pill-btn glass-btn-icon flex-shrink-0 ${isVoiceRecording ? 'bg-destructive text-destructive-foreground' : ''}`}>
+            {isVoiceRecording ? <MicOff className="w-4 h-4 relative z-10" /> : <Mic className="w-4 h-4 text-muted-foreground relative z-10" />}
+          </motion.button>
+          <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()} placeholder={isVoiceRecording ? t('recording') : t('chatPlaceholder')}
+            className="glass-input flex-1 px-4 py-2.5 rounded-full bg-secondary text-sm text-secondary-foreground border border-border focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow" />
           <motion.button
             whileTap={{ scale: 0.85 }}
             whileHover={{ scale: 1.08 }}
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             onClick={sendMessage} disabled={loading || !input.trim()}
-            className="px-4 py-2.5 pill-btn-glow gradient-bg text-primary-foreground disabled:opacity-40 transition-opacity">
+            className="px-4 py-2.5 pill-btn-glow gradient-bg text-primary-foreground disabled:opacity-40 transition-opacity flex-shrink-0">
             {loading ? <Loader2 className="w-4 h-4 animate-spin relative z-10" /> : <Send className="w-4 h-4 relative z-10" />}
           </motion.button>
         </div>

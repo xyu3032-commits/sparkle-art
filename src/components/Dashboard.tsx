@@ -14,6 +14,7 @@ import ImageGenerator from '@/components/tools/ImageGenerator';
 import TextToVideo from '@/components/tools/TextToVideo';
 import ImageToVideo from '@/components/tools/ImageToVideo';
 import AudioGenerator from '@/components/tools/AudioGenerator';
+import VoiceTranslator from '@/components/tools/VoiceTranslator';
 import PromptLibrary from '@/components/PromptLibrary';
 
 const toolComponents: Record<string, React.FC> = {
@@ -22,6 +23,7 @@ const toolComponents: Record<string, React.FC> = {
   textToVideo: TextToVideo,
   imageToVideo: ImageToVideo,
   audioGen: AudioGenerator,
+  voiceTranslate: VoiceTranslator,
   promptLib: PromptLibrary,
 };
 
