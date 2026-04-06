@@ -341,13 +341,13 @@
     z-index: 1;
   }
   .glass-mode .glass-btn-action {
-    background: hsl(var(--card) / 0.18);
-    backdrop-filter: blur(14px) saturate(1.5);
-    -webkit-backdrop-filter: blur(14px) saturate(1.5);
-    border: 1px solid hsl(var(--border) / 0.15);
+    background: hsl(var(--card) / 0.22);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    border: 1px solid hsl(var(--border) / 0.2);
     box-shadow:
-      0 3px 12px hsl(0 0% 0% / 0.05),
-      inset 0 1px 0 hsl(0 0% 100% / 0.12);
+      0 3px 14px hsl(0 0% 0% / 0.07),
+      inset 0 1px 0 hsl(0 0% 100% / 0.18);
   }
   .glass-mode .glass-btn-action:hover {
     background: hsl(var(--card) / 0.3);
