@@ -265,18 +265,18 @@
   /* Glass cards — use will-change for GPU acceleration */
   .admin-glass-card {
     background: hsl(var(--card));
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     will-change: auto;
   }
   .glass-mode .admin-glass-card {
     background: hsl(var(--surface-glass));
-    backdrop-filter: blur(24px) saturate(1.8);
-    -webkit-backdrop-filter: blur(24px) saturate(1.8);
-    border-color: hsl(var(--border) / 0.3);
+    backdrop-filter: blur(32px) saturate(2);
+    -webkit-backdrop-filter: blur(32px) saturate(2);
+    border-color: hsl(var(--border) / 0.25);
     box-shadow:
-      0 8px 32px hsl(0 0% 0% / 0.08),
-      inset 0 1px 0 hsl(0 0% 100% / 0.18),
-      inset 0 -1px 0 hsl(0 0% 0% / 0.04);
+      0 8px 40px hsl(0 0% 0% / 0.1),
+      inset 0 1px 0 hsl(0 0% 100% / 0.25),
+      inset 0 -1px 0 hsl(0 0% 0% / 0.05);
     will-change: transform;
   }
 
