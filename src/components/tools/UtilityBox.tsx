@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Lock, Unlock, Hash, FileCode, QrCode, Palette, ArrowLeft, Copy, Check, RefreshCw } from 'lucide-react';
+import { Globe, Lock, Hash, FileCode, QrCode, Palette, ArrowLeft, Copy, Check, RefreshCw, FileText, KeyRound, AlignLeft, Type } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-type UtilTool = 'htmlSource' | 'base64' | 'hash' | 'jsonFormat' | 'colorPicker' | 'urlEncode' | 'timestamp' | 'regex';
+type UtilTool = 'htmlSource' | 'base64' | 'hash' | 'jsonFormat' | 'colorPicker' | 'urlEncode' | 'timestamp' | 'regex' | 'markdown' | 'password' | 'wordCount' | 'lorem';
 
 const utilTools: { id: UtilTool; icon: React.ElementType; labelKey: string }[] = [
   { id: 'htmlSource', icon: Globe, labelKey: 'utilHtmlSource' },
@@ -15,6 +15,10 @@ const utilTools: { id: UtilTool; icon: React.ElementType; labelKey: string }[] =
   { id: 'urlEncode', icon: QrCode, labelKey: 'utilUrlEncode' },
   { id: 'timestamp', icon: RefreshCw, labelKey: 'utilTimestamp' },
   { id: 'regex', icon: FileCode, labelKey: 'utilRegex' },
+  { id: 'markdown', icon: FileText, labelKey: 'utilMarkdown' },
+  { id: 'password', icon: KeyRound, labelKey: 'utilPassword' },
+  { id: 'wordCount', icon: AlignLeft, labelKey: 'utilWordCount' },
+  { id: 'lorem', icon: Type, labelKey: 'utilLorem' },
 ];
 
 const cardVariants = {
