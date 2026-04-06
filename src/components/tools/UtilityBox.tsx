@@ -275,7 +275,7 @@ const UtilityBox: React.FC = () => {
               className="px-4 py-2.5 rounded-full border border-border glass-btn-action text-sm font-medium
                 text-foreground hover:border-primary/30 transition-all"
             >
-              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
             </motion.button>
           )}
         </div>
