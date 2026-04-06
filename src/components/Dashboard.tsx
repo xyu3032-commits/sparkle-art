@@ -16,6 +16,7 @@ import ImageToVideo from '@/components/tools/ImageToVideo';
 import AudioGenerator from '@/components/tools/AudioGenerator';
 import VoiceTranslator from '@/components/tools/VoiceTranslator';
 import PromptLibrary from '@/components/PromptLibrary';
+import UtilityBox from '@/components/tools/UtilityBox';
 
 const toolComponents: Record<string, React.FC> = {
   textGen: TextGenerator,
@@ -25,6 +26,7 @@ const toolComponents: Record<string, React.FC> = {
   audioGen: AudioGenerator,
   voiceTranslate: VoiceTranslator,
   promptLib: PromptLibrary,
+  utilityBox: UtilityBox,
 };
 
 const Dashboard: React.FC = () => {
