@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Lock, Unlock, Hash, FileCode, QrCode, Palette, ArrowLeft, Copy, Check, RefreshCw } from 'lucide-react';
+import { Globe, Lock, Hash, FileCode, QrCode, Palette, ArrowLeft, Copy, Check, RefreshCw, FileText, KeyRound, AlignLeft, Type } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-type UtilTool = 'htmlSource' | 'base64' | 'hash' | 'jsonFormat' | 'colorPicker' | 'urlEncode' | 'timestamp' | 'regex';
+type UtilTool = 'htmlSource' | 'base64' | 'hash' | 'jsonFormat' | 'colorPicker' | 'urlEncode' | 'timestamp' | 'regex' | 'markdown' | 'password' | 'wordCount' | 'lorem';
 
 const utilTools: { id: UtilTool; icon: React.ElementType; labelKey: string }[] = [
   { id: 'htmlSource', icon: Globe, labelKey: 'utilHtmlSource' },
@@ -15,6 +15,10 @@ const utilTools: { id: UtilTool; icon: React.ElementType; labelKey: string }[] =
   { id: 'urlEncode', icon: QrCode, labelKey: 'utilUrlEncode' },
   { id: 'timestamp', icon: RefreshCw, labelKey: 'utilTimestamp' },
   { id: 'regex', icon: FileCode, labelKey: 'utilRegex' },
+  { id: 'markdown', icon: FileText, labelKey: 'utilMarkdown' },
+  { id: 'password', icon: KeyRound, labelKey: 'utilPassword' },
+  { id: 'wordCount', icon: AlignLeft, labelKey: 'utilWordCount' },
+  { id: 'lorem', icon: Type, labelKey: 'utilLorem' },
 ];
 
 const cardVariants = {
@@ -118,6 +122,69 @@ const UtilityBox: React.FC = () => {
           }
           break;
         }
+        case 'markdown': {
+          const html = input
+            .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+            .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+            .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`(.+?)`/g, '<code>$1</code>')
+            .replace(/^\- (.+)$/gm, '• $1')
+            .replace(/^\d+\. (.+)$/gm, (_, p1, offset, str) => `${str.substring(0, offset).split('\n').filter(l => /^\d+\./.test(l)).length + 1}. ${p1}`)
+            .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
+            .replace(/\n/g, '<br/>');
+          setOutput(html);
+          break;
+        }
+        case 'password': {
+          const len = Math.max(8, Math.min(128, parseInt(input) || 16));
+          const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+          const passwords: string[] = [];
+          for (let j = 0; j < 5; j++) {
+            let pw = '';
+            const arr = new Uint32Array(len);
+            crypto.getRandomValues(arr);
+            for (let i = 0; i < len; i++) pw += chars[arr[i] % chars.length];
+            passwords.push(pw);
+          }
+          setOutput(passwords.join('\n'));
+          break;
+        }
+        case 'wordCount': {
+          const text = input.trim();
+          const chars = text.length;
+          const charsNoSpace = text.replace(/\s/g, '').length;
+          const words = text ? text.split(/\s+/).length : 0;
+          const lines = text ? text.split('\n').length : 0;
+          const sentences = text ? (text.match(/[.!?。！？]+/g) || []).length : 0;
+          const paragraphs = text ? text.split(/\n\s*\n/).filter(p => p.trim()).length : 0;
+          setOutput(`Characters: ${chars}\nChars (no spaces): ${charsNoSpace}\nWords: ${words}\nLines: ${lines}\nSentences: ${sentences}\nParagraphs: ${paragraphs || 1}`);
+          break;
+        }
+        case 'lorem': {
+          const count = Math.max(1, Math.min(50, parseInt(input) || 3));
+          const sentences = [
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+            'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
+            'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.',
+            'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.',
+            'Nulla facilisi morbi tempus iaculis urna id volutpat lacus.',
+            'Viverra accumsan in nisl nisi scelerisque eu ultrices vitae auctor.',
+            'Eget nulla facilisi etiam dignissim diam quis enim lobortis.',
+            'Amet consectetur adipiscing elit pellentesque habitant morbi tristique senectus.',
+            'Turpis egestas pretium aenean pharetra magna ac placerat vestibulum.',
+          ];
+          const paragraphs: string[] = [];
+          for (let p = 0; p < count; p++) {
+            const sentCount = 3 + Math.floor(Math.random() * 4);
+            const para = Array.from({ length: sentCount }, () => sentences[Math.floor(Math.random() * sentences.length)]).join(' ');
+            paragraphs.push(para);
+          }
+          setOutput(paragraphs.join('\n\n'));
+          break;
+        }
       }
     } catch (e: any) {
       setOutput(`Error: ${e.message}`);
@@ -162,6 +229,10 @@ const UtilityBox: React.FC = () => {
       case 'urlEncode': return mode === 'encode' ? 'hello world & foo=bar' : 'hello%20world';
       case 'timestamp': return '1700000000 or 2024-01-01T00:00:00Z';
       case 'regex': return 'Line 1: regex pattern\nLine 2+: test string';
+      case 'markdown': return '# Title\n**bold** *italic* `code`\n- list item';
+      case 'password': return '16 (password length, 8-128)';
+      case 'wordCount': return 'Paste text here to analyze...';
+      case 'lorem': return '3 (number of paragraphs)';
       default: return '';
     }
   };
