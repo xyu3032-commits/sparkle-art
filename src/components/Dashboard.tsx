@@ -73,10 +73,10 @@ const Dashboard: React.FC = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentTool}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 16, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.97 }}
+              transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 28 }}
               className="h-full"
             >
               <ToolComponent />

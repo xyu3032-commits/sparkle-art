@@ -12,6 +12,7 @@ const toolItems = [
   { id: 'audioGen', icon: Music, labelKey: 'audioGen' },
   { id: 'voiceTranslate', icon: Languages, labelKey: 'voiceTranslate' },
   { id: 'promptLib', icon: BookOpen, labelKey: 'promptLibrary' },
+  { id: 'utilityBox', icon: Wrench, labelKey: 'utilityBox' },
 ];
 
 const Sidebar: React.FC<{ collapsed?: boolean }> = ({ collapsed }) => {
