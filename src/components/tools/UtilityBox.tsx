@@ -229,6 +229,10 @@ const UtilityBox: React.FC = () => {
       case 'urlEncode': return mode === 'encode' ? 'hello world & foo=bar' : 'hello%20world';
       case 'timestamp': return '1700000000 or 2024-01-01T00:00:00Z';
       case 'regex': return 'Line 1: regex pattern\nLine 2+: test string';
+      case 'markdown': return '# Title\n**bold** *italic* `code`\n- list item';
+      case 'password': return '16 (password length, 8-128)';
+      case 'wordCount': return 'Paste text here to analyze...';
+      case 'lorem': return '3 (number of paragraphs)';
       default: return '';
     }
   };
