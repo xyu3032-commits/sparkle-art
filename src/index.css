@@ -208,7 +208,8 @@
     overflow: hidden;
     isolation: isolate;
   }
-  .pill-btn::before {
+  /* Reflection only in glass mode */
+  .glass-mode .pill-btn::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -221,16 +222,18 @@
     );
     pointer-events: none;
     z-index: 1;
+    opacity: 0;
+    animation: glass-reflect-in 0.6s ease forwards;
   }
 
-  /* Pill button with glow on hover */
+  /* Pill button with glow — glass only */
   .pill-btn-glow {
     border-radius: 9999px;
     position: relative;
     overflow: hidden;
     isolation: isolate;
   }
-  .pill-btn-glow::before {
+  .glass-mode .pill-btn-glow::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -243,8 +246,10 @@
     );
     pointer-events: none;
     z-index: 1;
+    opacity: 0;
+    animation: glass-reflect-in 0.6s ease forwards;
   }
-  .pill-btn-glow::after {
+  .glass-mode .pill-btn-glow::after {
     content: '';
     position: absolute;
     top: -50%;
@@ -258,8 +263,13 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  .pill-btn-glow:hover::after {
+  .glass-mode .pill-btn-glow:hover::after {
     opacity: 1;
+  }
+
+  @keyframes glass-reflect-in {
+    0% { opacity: 0; transform: translateY(-4px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
 
   /* Glass cards — use will-change for GPU acceleration */
@@ -280,7 +290,7 @@
     will-change: transform;
   }
 
-  /* Individual glass icon button — oval with reflection */
+  /* Individual glass icon button — plain without glass, enhanced with glass */
   .glass-btn-icon {
     position: relative;
     background: transparent;
@@ -289,7 +299,11 @@
     isolation: isolate;
     transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   }
-  .glass-btn-icon::before {
+  .glass-btn-icon:hover {
+    background: hsl(var(--secondary));
+  }
+  /* Reflection only in glass mode */
+  .glass-mode .glass-btn-icon::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -298,6 +312,8 @@
     background: linear-gradient(180deg, hsl(0 0% 100% / 0.18), transparent);
     pointer-events: none;
     z-index: 1;
+    opacity: 0;
+    animation: glass-reflect-in 0.6s ease forwards;
   }
   .glass-mode .glass-btn-icon {
     background: hsl(var(--card) / 0.3);
@@ -322,7 +338,7 @@
     transform: scale(0.94);
   }
 
-  /* Glass action button — oval with deeper glass + reflection */
+  /* Glass action button — plain without glass */
   .glass-btn-action {
     position: relative;
     border-radius: 9999px;
@@ -330,7 +346,11 @@
     isolation: isolate;
     transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   }
-  .glass-btn-action::before {
+  .glass-btn-action:hover {
+    background: hsl(var(--secondary));
+  }
+  /* Reflection only in glass mode */
+  .glass-mode .glass-btn-action::before {
     content: '';
     position: absolute;
     top: 0; left: 10%; right: 10%;
@@ -339,6 +359,8 @@
     background: linear-gradient(180deg, hsl(0 0% 100% / 0.15), transparent);
     pointer-events: none;
     z-index: 1;
+    opacity: 0;
+    animation: glass-reflect-in 0.6s ease forwards;
   }
   .glass-mode .glass-btn-action {
     background: hsl(var(--card) / 0.22);
@@ -369,7 +391,7 @@
     position: relative;
     transition: background 0.2s ease, box-shadow 0.2s ease;
   }
-  .glass-nav-item::before {
+  .glass-mode .glass-nav-item::before {
     content: '';
     position: absolute;
     top: 0; left: 15%; right: 15%;
@@ -378,10 +400,7 @@
     pointer-events: none;
     z-index: 1;
     opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-  .glass-mode .glass-nav-item::before {
-    opacity: 1;
+    animation: glass-reflect-in 0.6s ease forwards;
   }
   .glass-mode .glass-nav-item:hover {
     background: hsl(var(--card) / 0.25);
@@ -423,12 +442,13 @@
     background: hsl(var(--secondary) / 0.18);
   }
 
-  /* Glass input fields */
+  /* Glass input fields — plain without glass */
   .glass-input {
     position: relative;
     transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
-  .glass-input::before {
+  /* Reflection only in glass mode */
+  .glass-mode .glass-input::before {
     content: '';
     position: absolute;
     top: 0; left: 10%; right: 10%;
@@ -437,6 +457,8 @@
     pointer-events: none;
     z-index: 1;
     border-radius: 9999px;
+    opacity: 0;
+    animation: glass-reflect-in 0.6s ease forwards;
   }
   .glass-mode .glass-input {
     background: hsl(var(--card) / 0.22) !important;
