@@ -442,12 +442,13 @@
     background: hsl(var(--secondary) / 0.18);
   }
 
-  /* Glass input fields */
+  /* Glass input fields — plain without glass */
   .glass-input {
     position: relative;
     transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
-  .glass-input::before {
+  /* Reflection only in glass mode */
+  .glass-mode .glass-input::before {
     content: '';
     position: absolute;
     top: 0; left: 10%; right: 10%;
@@ -456,6 +457,8 @@
     pointer-events: none;
     z-index: 1;
     border-radius: 9999px;
+    opacity: 0;
+    animation: glass-reflect-in 0.6s ease forwards;
   }
   .glass-mode .glass-input {
     background: hsl(var(--card) / 0.22) !important;
