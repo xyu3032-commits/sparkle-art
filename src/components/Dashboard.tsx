@@ -43,11 +43,9 @@ const Dashboard: React.FC = () => {
     >
       {backgroundUrl && <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />}
 
-      {!isMobile && (
-        <div className="relative z-10">
-          <Sidebar />
-        </div>
-      )}
+      <div className="relative z-10 hidden sm:block">
+        <Sidebar />
+      </div>
 
       {isMobile && <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />}
 
